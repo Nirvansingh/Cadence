@@ -8,7 +8,8 @@ import {
   Sliders, 
   Volume2, 
   VolumeX, 
-  ArrowDownToLine 
+  ArrowDownToLine,
+  Sparkles
 } from 'lucide-react';
 
 export type NavTab = 'habits' | 'timetable' | 'focus' | 'kanban' | 'notes' | 'utilities';
@@ -19,6 +20,7 @@ interface SidebarProps {
   soundEnabled: boolean;
   onToggleSound: () => void;
   onExportBackup: () => void;
+  onOpenLanding?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -26,7 +28,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange,
   soundEnabled,
   onToggleSound,
-  onExportBackup
+  onExportBackup,
+  onOpenLanding
 }) => {
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'habits', label: 'Daily Habits', icon: <CheckCircle2 size={15} strokeWidth={2} />, color: 'var(--amber)' },
@@ -196,6 +199,33 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <ArrowDownToLine size={14} />
           <span>Save Backup (JSON)</span>
         </button>
+
+        {onOpenLanding && (
+          <button
+            onClick={onOpenLanding}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '7px 10px',
+              borderRadius: 'var(--radius-sm)',
+              color: 'var(--text-muted)',
+              fontSize: '11.5px',
+              transition: 'var(--transition-fast)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
+          >
+            <Sparkles size={14} color="var(--amber)" />
+            <span>Tour & Setup Wizard</span>
+          </button>
+        )}
       </div>
     </aside>
   );
