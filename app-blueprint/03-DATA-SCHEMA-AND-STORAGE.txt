@@ -1,0 +1,134 @@
+================================================================================
+03. DATA SCHEMA & STORAGE ARCHITECTURE
+================================================================================
+Project: Next-Gen Open-Source Productivity Suite & Hybrid SaaS
+Format: SQLite / JSON Local-First Schemas
+
+1. LOCAL DATABASE SCHEMAS (SQLITE / INDEXEDDB)
+--------------------------------------------------------------------------------
+
+TABLE: user_profile
+  id TEXT PRIMARY KEY,
+  display_name TEXT NOT NULL DEFAULT 'User',
+  email TEXT,
+  timezone TEXT NOT NULL DEFAULT 'Asia/Kolkata',
+  theme TEXT NOT NULL DEFAULT 'oled-dark',
+  sound_enabled INTEGER NOT NULL DEFAULT 1,
+  auto_lock_minutes INTEGER NOT NULL DEFAULT 5,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+
+TABLE: habits
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,       -- 'study', 'coding', 'health', 'routine', 'mindset'
+  time_of_day TEXT,             -- 'morning', 'afternoon', 'evening', 'night', 'anytime'
+  cue TEXT,                     -- Trigger description
+  routine TEXT,                 -- Action steps
+  reward TEXT,                  -- Reward/benefit
+  icon TEXT,                    -- Emoji or icon key
+  color TEXT,                   -- Hex or CSS variable
+  target_days_mask INTEGER,     -- Bitmask: 1=Mon, 2=Tue, 4=Wed, 8=Thu, 16=Fri, 32=Sat, 64=Sun (127=daily)
+  sort_order INTEGER DEFAULT 0,
+  is_archived INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+
+TABLE: habit_logs
+  id TEXT PRIMARY KEY,
+  habit_id TEXT NOT NULL REFERENCES habits(id) ON DELETE CASCADE,
+  completed_date TEXT NOT NULL, -- 'YYYY-MM-DD'
+  completed_at INTEGER NOT NULL,
+  notes TEXT,
+  UNIQUE(habit_id, completed_date)
+
+TABLE: timetable_slots
+  id TEXT PRIMARY KEY,
+  day_of_week TEXT NOT NULL,    -- 'Monday', 'Tuesday', ..., 'Sunday'
+  start_time TEXT NOT NULL,     -- 'HH:MM' (24-hour format)
+  end_time TEXT NOT NULL,       -- 'HH:MM'
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,       -- 'school', 'tuition', 'study', 'workout', 'meals', 'sleep', 'other'
+  note TEXT,
+  sort_order INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+
+TABLE: notes
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  tags TEXT,                    -- JSON array of strings: '["Maths", "NCERT"]'
+  is_pinned INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+
+TABLE: tasks
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  status TEXT NOT NULL,         -- 'todo', 'in_progress', 'done'
+  priority TEXT NOT NULL,       -- 'low', 'medium', 'high', 'urgent'
+  due_date TEXT,                -- 'YYYY-MM-DD'
+  tags TEXT,                    -- JSON array
+  sort_order INTEGER DEFAULT 0,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+
+TABLE: vault_items
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL,
+  encrypted_blob TEXT NOT NULL, -- Encrypted ciphertext (AES-256-GCM)
+  iv TEXT NOT NULL,             -- Initialization Vector
+  auth_tag TEXT NOT NULL,       -- Authentication Tag
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+
+2. PORTABLE JSON EXPORT SCHEMA (FOR BACKUP / RESTORE)
+--------------------------------------------------------------------------------
+{
+  "version": "1.0.0",
+  "exported_at": "2026-10-12T21:40:00Z",
+  "profile": {
+    "display_name": "Student",
+    "timezone": "Asia/Kolkata",
+    "theme": "oled-dark"
+  },
+  "habits": [
+    {
+      "id": "h_1",
+      "title": "Morning Wake & Hydration",
+      "category": "health",
+      "timeOfDay": "morning",
+      "cue": "Alarm at 6:00 AM",
+      "routine": "500ml water + stretch",
+      "reward": "Zero morning brain fog",
+      "history": {
+        "2026-10-12": true
+      }
+    }
+  ],
+  "timetable": {
+    "Monday": [
+      {
+        "id": "m_1",
+        "start": "06:00",
+        "end": "06:30",
+        "title": "Morning Routine",
+        "category": "meals",
+        "note": "Hydrate & breakfast"
+      }
+    ]
+  },
+  "notes": [],
+  "tasks": []
+}
+
+3. ENCRYPTION SPECIFICATIONS (ZERO-KNOWLEDGE)
+--------------------------------------------------------------------------------
+- Master Passphrase Key Derivation: PBKDF2 (SHA-256, 310,000 iterations) or Argon2id.
+- Symmetric Cipher: AES-256-GCM with unique 96-bit IV per encryption.
+- Zero-Knowledge Principle: The master password is never stored anywhere on disk or
+  memory. Only the derived verification hash is checked.
+================================================================================

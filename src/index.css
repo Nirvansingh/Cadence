@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Rich Dark Canvas - Deep Obsidian with High Clarity & Contrast */
+  --bg-app: #090b10;
+  --bg-surface: #0f1219;
+  --bg-subtle: #141823;
+  --bg-card: #141824;
+  --bg-card-hover: #191e2e;
+  --bg-card-active: #1f2537;
+
+  /* Crisp Hairline Borders */
+  --border-hairline: rgba(255, 255, 255, 0.07);
+  --border-subtle: rgba(255, 255, 255, 0.11);
+  --border-focus: rgba(255, 255, 255, 0.22);
+
+  /* High-Contrast Typography */
+  --text-pure: #ffffff;
+  --text-main: #e8ecf4;
+  --text-secondary: #9aa2b4;
+  --text-muted: #677186;
+  --text-faint: #434c5e;
+
+  /* Rich, Curated Jewel Tones - Vibrant & Sophisticated (Zero Radioactive Neon) */
+  --emerald: #10b981;
+  --emerald-subtle: rgba(16, 185, 129, 0.12);
+  --emerald-border: rgba(16, 185, 129, 0.28);
+
+  --sky: #38bdf8;
+  --sky-subtle: rgba(56, 189, 248, 0.12);
+  --sky-border: rgba(56, 189, 248, 0.28);
+
+  --amber: #f59e0b;
+  --amber-subtle: rgba(245, 158, 11, 0.12);
+  --amber-border: rgba(245, 158, 11, 0.28);
+
+  --violet: #8b5cf6;
+  --violet-subtle: rgba(139, 92, 246, 0.12);
+  --violet-border: rgba(139, 92, 246, 0.28);
+
+  --rose: #f43f5e;
+  --rose-subtle: rgba(244, 63, 94, 0.12);
+  --rose-border: rgba(244, 63, 94, 0.28);
+
+  /* Geometry & Precision */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 9999px;
+  
+  --transition-fast: 0.15s ease;
+  --transition-standard: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  overflow: hidden;
+  user-select: none;
+}
+
+code, pre, .mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Precision Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Panels & Cards */
+.panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+}
+
+.panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-standard);
+}
+
+.panel-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-subtle);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  outline: none;
+  background: transparent;
+  color: var(--text-main);
+}
+
+@keyframes quietFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-quiet {
+  animation: quietFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

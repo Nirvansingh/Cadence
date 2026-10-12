@@ -1,0 +1,92 @@
+================================================================================
+02. FEATURES & STUDENT/LEARNER WORKFLOW SPECIFICATIONS
+================================================================================
+Project: Next-Gen Open-Source Productivity Suite & Hybrid SaaS
+Target Audience: High School Students, Self-Taught Coders, Knowledge Workers
+
+1. THE HABIT LOOP TRACKER & DAILY CHECKLIST
+--------------------------------------------------------------------------------
+Built upon the neuroscience of "The Habit Loop": Cue ➔ Routine ➔ Reward.
+
+Core Components:
+  - Daily Interactive Checklist:
+      * 1-click round circular checkbox with smooth spring-physics tick animation.
+      * Instant sound feedback and micro-haptic visual reward.
+      * Live Daily Progress Ring: SVG circular progress showing completion (e.g. 71%).
+      * Streak Flame Engine: Tracks consecutive completion days with flame badges (🔥 5d).
+  - The Habit Loop Blueprint Drawer:
+      * Clicking "The Habit Loop ▾" on any habit reveals its 3 connected steps:
+          1. ⚡ Cue (The Trigger): Time, context, or preceding action.
+             Example: "Alarm rings at 6:00 AM" / "Walking home from tuition at 4:00 PM".
+          2. 🔄 Routine (The Action): The micro-step to execute.
+             Example: "Drink 500ml water + stretch" / "Solve 5 Math NCERT problems".
+          3. 🎁 Reward (The Benefit): The psychological celebration.
+             Example: "Zero morning fatigue" / "Guilt-free 1h evening gaming".
+  - 7-Day Mini Heatmap Row:
+      * Visual 7-dot strip (M T W T F S S) showing weekly consistency at a glance.
+  - Category Tiers:
+      * 🌅 Morning Ignition (Wake up, hydrate, plan day).
+      * 📚 Deep Study & Homework (Tuitions, homework, revision).
+      * 💻 Coding & Creation (Building tools, shipping software).
+      * 🏃 Physical Health (Movement, pushups, walks).
+      * 🌙 Evening Wind-down (Pack school bag, formulas review, sleep).
+
+2. ADAPTIVE TIMETABLE & CALENDAR ENGINE
+--------------------------------------------------------------------------------
+Designed specifically for modern students with fragmented days (school, commutes,
+tuitions, self-study, coding, meals, sleep).
+
+Features:
+  - Day-by-Day Schedule View (Monday to Sunday):
+      * Each day has its own independent, customizable schedule.
+      * Pre-populated with intelligent templates (School + Tuition, Self-Taught Dev, Exam Sprint).
+  - 24-Hour Hairline Timeline:
+      * Slim visual bar representing the full 24 hours of the day.
+      * Segments color-coded by category (School, Tuition, Study, Workout, Meals, Sleep).
+      * Dynamic Free Time Calculator: Instantly computes remaining discretionary hours.
+  - Commute & Transit Buffer Automation:
+      * Built-in 10-15 minute buffers for freshening up, packing bag, or transit.
+  - Export & Sync:
+      * 1-Click offline .ics calendar generator formatted with RFC 5545 compliance
+        (Asia/Kolkata or user timezone, weekly recurrence RRULEs).
+      * Single-click import into Google Calendar, Outlook, Apple Calendar.
+      * Optional direct Google Calendar API integration.
+
+3. DEEP FOCUS & POMODORO STUDIO
+--------------------------------------------------------------------------------
+Features:
+  - Customizable Interval Engine:
+      * 25m Focus / 5m Break (Classic Pomodoro).
+      * 45m Focus / 15m Break (High School Class Block).
+      * 90m Deep Work (Ultradian Rhythm Coding Sprint).
+  - Precision Stopwatch with split laps.
+  - Full-screen Zen Mode: Distraction-free countdown timer with minimal UI.
+  - Ambient Sound Synthesizer: Procedural White Noise, Brown Noise, Rain Sounds
+    (100% offline, zero streaming lag).
+
+4. SCRATCHPAD & STUDY NOTES
+--------------------------------------------------------------------------------
+Features:
+  - Local Markdown Editor with live split-pane preview.
+  - Code syntax highlighting for Python, JS, C++, HTML/CSS.
+  - LaTeX Math Formula Rendering (via KaTeX offline) for Physics & Math formulas.
+  - Tagging & Search: Fast multi-tag filtering (e.g. #Physics, #Maths, #Algorithms).
+  - Export to Markdown, Plain Text, or formatted HTML.
+
+5. ASSIGNMENT & TASK KANBAN BOARD
+--------------------------------------------------------------------------------
+Features:
+  - 3-Column Visual Board: To Do ➔ In Progress ➔ Completed.
+  - Priority Badges: Urgent (Coral), Medium (Amber), Normal (Blue).
+  - Due Dates with Countdown Badges: "Due in 2 days", "Overdue".
+  - Subject tags and checklist subtasks inside each task card.
+
+6. DEVELOPER & UTILITY TOOLBOX
+--------------------------------------------------------------------------------
+Features:
+  - Multi-Mode Calculator: Standard, Scientific, and Programmer (Hex, Dec, Oct, Bin).
+  - Unit & World Timezone Converter.
+  - Offline QR Code Studio: Generate and export high-res PNG/SVG QR codes.
+  - Dev Toolbox: JSON Formatter & Validator, Base64 encoder, SHA-256 hash generator.
+  - Password Vault: Zero-knowledge AES-256 local encrypted credentials manager.
+================================================================================

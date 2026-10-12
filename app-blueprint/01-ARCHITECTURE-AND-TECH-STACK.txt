@@ -1,0 +1,101 @@
+================================================================================
+01. ARCHITECTURE & TECHNICAL STACK SPECIFICATION
+================================================================================
+Project: Next-Gen Open-Source Productivity Suite & Hybrid SaaS
+Target Audience: Students, Self-Directed Learners, Tech Creators
+
+1. CORE TECHNICAL ARCHITECTURE: HYBRID LOCAL-FIRST
+--------------------------------------------------------------------------------
+The application is engineered around the "Local-First" software philosophy:
+- The local device is the Single Source of Truth (SSOT).
+- All reads and writes occur instantly against local storage without network latency.
+- Works 100% offline in planes, school libraries, or without internet.
+- Multi-device sync is an additive layer on top of local data, using End-to-End
+  Encryption (E2EE) so the server never reads the user's private data.
+
+2. RECOMMENDED DESKTOP CLIENT STACK
+--------------------------------------------------------------------------------
+Option 1: TAURI (Rust) + TypeScript + Vite + React / Svelte [RECOMMENDED]
+  - Binary Size: ~8 MB to 15 MB (ultra-lightweight).
+  - RAM Footprint: ~30 MB to 60 MB (compared to Electron's 250MB+).
+  - Performance: Native Rust backend for cryptography, file IO, and hardware metrics.
+  - Security: Native OS webview sandbox (Edge WebView2 on Windows, WebKit on macOS).
+  - Cross-Platform: Produces Windows (.msi / .exe), macOS (.dmg), and Linux (.AppImage).
+
+Option 2: ELECTRON + TypeScript + Vite
+  - Binary Size: ~90 MB to 150 MB.
+  - RAM Footprint: ~180 MB to 300 MB.
+  - Advantage: Identical Chromium runtime everywhere, easier Node.js package usage.
+  - Disadvantage: Heavy resource usage for a lightweight background productivity app.
+
+Option 3: PYWEBVIEW 2.0 (Python + Modern Web UI)
+  - Similar to the personal sandbox, but compiled via PyInstaller / Nuitka.
+  - Great for rapid prototyping, but distribution and cross-platform builds are
+    harder to maintain than Tauri.
+
+CONCLUSION: Tauri + Vite + TypeScript provides the most professional, lightweight,
+and open-source-friendly foundation.
+
+3. FRONTEND ARCHITECTURE & DESIGN SYSTEM
+--------------------------------------------------------------------------------
+- Core Framework: React 19 / Svelte 5 / Vanilla TS with component modules.
+- CSS Strategy: Vanilla CSS Tokens or Tailwind v4 with a tailored design system:
+    * Backgrounds: Deep matte obsidian (#090a0d, #0e1015).
+    * Borders: Hairline low-contrast borders (rgba(255, 255, 255, 0.06)).
+    * Typography: Inter / SF Pro / Roboto with tabular numerals for timers.
+    * Accents: Purposeful, vibrant pastel badges:
+        - Emerald (#10b981) for habits, completion rings, streaks.
+        - Electric Blue / Sky (#38bdf8 / #3b82f6) for timetable, subjects, study blocks.
+        - Indigo / Violet (#8b5cf6) for coding, deep focus, rewards.
+        - Amber / Gold (#f59e0b) for cues, flames, streak milestones.
+        - Coral / Rose (#f43f5e) for school hours, high-priority tasks.
+- Spacing: Notion/Linear style generous padding (24px-36px), cards that reveal
+  actions on hover, eliminating crowded UI clutter.
+
+4. LOCAL DATA LAYER & ADAPTER PATTERN
+--------------------------------------------------------------------------------
+Architecture: Unified Storage Adapter (`StorageAdapter`):
+  [UI Component] ➔ [StorageAdapter] ➔ [Local DB: SQLite / IndexedDB]
+                                   ↘ [Optional: E2EE Sync Engine]
+
+Interface:
+  interface IStorageAdapter {
+    get<T>(key: string, defaultVal?: T): Promise<T>;
+    set<T>(key: string, value: T): Promise<boolean>;
+    delete(key: string): Promise<boolean>;
+    exportBackup(): Promise<Blob>;
+    importBackup(fileData: string): Promise<boolean>;
+    syncWithCloud?(authToken: string): Promise<SyncResult>;
+  }
+
+- Desktop Local Storage: SQLite via Tauri SQL plugin (or encrypted SQLCipher).
+- Browser / PWA Local Storage: IndexedDB via Dexie.js or idb-keyval.
+
+5. CLOUD SYNC SAAS LAYER (PHASE 2)
+--------------------------------------------------------------------------------
+- Backend Engine: Cloudflare Workers + D1 (Edge SQLite) OR Supabase (PostgreSQL).
+- Encryption: Zero-Knowledge End-to-End Encryption (E2EE).
+    * Client derives encryption key from user master passphrase using PBKDF2 / Argon2.
+    * Data is encrypted locally with AES-256-GCM before sending over HTTPS.
+    * Server only stores encrypted ciphertext blobs with vector clocks / timestamps.
+- Conflict Resolution: Last-Write-Wins (LWW) with CRDT (Conflict-free Replicated
+  Data Types) for checklist items and notes.
+
+6. COMMUNITY PLUGIN ARCHITECTURE
+--------------------------------------------------------------------------------
+To foster a vibrant open-source contributor ecosystem, any developer should be able
+to contribute a new tool with a standard manifest:
+
+  interface PluginManifest {
+    id: string;
+    title: string;
+    description: string;
+    category: 'productivity' | 'study' | 'dev' | 'utility';
+    iconSvg: string;
+    entryComponent: Component;
+    shortcuts?: string[];
+  }
+
+This allows contributors to build tools like Flashcard Decks, GPA Calculators,
+GitHub Commit Trackers, or Spotify Focus Widget easily.
+================================================================================

@@ -1,0 +1,132 @@
+================================================================================
+04. STEP-BY-STEP EXECUTION GUIDE: BUILDING THE NEW APP
+================================================================================
+Project: Next-Gen Open-Source Productivity Suite & Hybrid SaaS
+Target: Scaffolding a standalone production repository from scratch.
+
+This guide outlines exactly how to initialize your new project folder and migrate
+the tested components from this personal sandbox.
+
+================================================================================
+PHASE 1: SCAFFOLDING THE NEW REPOSITORY
+================================================================================
+
+Step 1.1: Choose Project Name
+  Recommended public names:
+  - "Cadence" (Rhythm, schedule, habits)
+  - "Aura OS" (Calm, personal daily workspace)
+  - "Nexus Tools" (Connected tools for learners)
+  - "OpenRoutine" / "FocusForge"
+
+Step 1.2: Initialize Project Folder
+  Open terminal in your projects directory (e.g., C:\Users\nirva\Projects) and run:
+
+  For Tauri + React + TypeScript (Recommended):
+  ```bash
+  npm create tauri-app@latest cadence-app -- --template react-ts
+  cd cadence-app
+  npm install
+  ```
+
+  Or for Next.js / React (Web + PWA first):
+  ```bash
+  npx create-next-app@latest cadence-app --typescript --tailwind --app
+  cd cadence-app
+  ```
+
+================================================================================
+PHASE 2: DIRECTORY STRUCTURE OF THE NEW APP
+================================================================================
+
+cadence-app/
+├── src-tauri/                     # Native Rust core (Desktop binary, SQLite, tray)
+│   ├── Cargo.toml
+│   └── src/
+│       └── main.rs
+├── src/
+│   ├── assets/                    # Icons, sound effects, fonts
+│   ├── components/                # Reusable UI components
+│   │   ├── ui/                    # Button, Card, Badge, Modal, Checkbox
+│   │   ├── layout/                # Sidebar, Header, Viewport, CmdPalette
+│   │   └── habit/                 # HabitCard, ProgressRing, HeatmapRow
+│   ├── modules/                   # Independent tool modules
+│   │   ├── habit-loop/            # Habit Loop Tracker & Daily Checklist
+│   │   ├── timetable/             # 24h Timeline, Day Schedule, .ics Exporter
+│   │   ├── focus-timer/           # Pomodoro intervals & Stopwatch
+│   │   ├── notes/                 # Markdown Scratchpad
+│   │   ├── kanban/                # Task & Assignment board
+│   │   └── utilities/             # Calculator, Converters, QR Studio
+│   ├── storage/                   # Local-First Database Adapters
+│   │   ├── database.ts            # SQLite / IndexedDB layer
+│   │   └── backup.ts              # JSON Export & Restore engine
+│   ├── types/                     # TypeScript Interfaces (Habit, Slot, Task)
+│   ├── styles/                    # Design tokens & CSS
+│   │   ├── variables.css          # Subtle matte obsidian tokens & vibrant accents
+│   │   └── globals.css
+│   ├── App.tsx                    # Shell router & command palette
+│   └── main.tsx
+├── public/
+├── package.json
+├── README.md                      # Open-source public README with screenshots
+├── LICENSE                        # MIT or AGPL-3.0
+└── CONTRIBUTING.md                # Guide for community contributors
+
+================================================================================
+PHASE 3: MIGRATING TESTED LOGIC FROM NIRVAAN-TOOLS
+================================================================================
+
+In your personal sandbox (`nirvaan-tools`), you already built and perfected:
+1. Habit Loop Logic:
+   - Copy algorithm and streak calculator from: `ui/js/modules/habits.js`
+   - Port Cue ➔ Routine ➔ Reward state into React/TypeScript component.
+2. Timetable & .ics Generator:
+   - Copy calendar RFC 5545 calculation & recurrence RRULE from: `ui/js/modules/timetable.js`
+   - Copy transit buffer logic and 24h timeline width calculator.
+3. Subtle & Spacious CSS Design Tokens:
+   - Copy obsidian palette and clean card styles from:
+     `ui/css/variables.css` and `ui/css/tools.css` (Sections 12 & 13).
+4. Procedural Audio Synthesizer:
+   - Copy Web Audio API click/success synthesizer from: `ui/js/core/sound.js`.
+
+================================================================================
+PHASE 4: PACKAGING & RELEASING THE OPEN-SOURCE APP
+================================================================================
+
+Step 4.1: Test Locally in Desktop Mode
+  ```bash
+  npm run tauri dev
+  ```
+  This boots up a blazing-fast native Windows window running your application!
+
+Step 4.2: Build Standalone Windows Installer (.exe / .msi)
+  ```bash
+  npm run tauri build
+  ```
+  Tauri will compile a production `.exe` and `.msi` inside `src-tauri/target/release/bundle/`.
+  This file is around 10MB and can be shared directly with friends, classmates, or on GitHub.
+
+Step 4.3: Publish to GitHub
+  ```bash
+  git init
+  git add .
+  git commit -m "feat: initial commit of Cadence open source productivity suite"
+  git branch -M main
+  git remote add origin https://github.com/your-username/cadence.git
+  git push -u origin main
+  ```
+
+Step 4.4: Add GitHub Release Automation (CI/CD)
+  - Set up a GitHub Action (`.github/workflows/release.yml`) using `tauri-action`.
+  - Every time you create a GitHub release tag (e.g. `v1.0.0`), GitHub automatically
+    builds Windows, macOS, and Linux installers and uploads them as download assets!
+
+================================================================================
+PHASE 5: LAUNCHING THE SAAS TIER (OPTIONAL CLOUD SYNC)
+================================================================================
+1. The app remains 100% free and open-source for all local desktop usage.
+2. Create a simple landing page (e.g., cadence.app or on Vercel).
+3. Offer "Cadence Cloud Sync" ($3/month or $29/year):
+   - End-to-end encrypted backup.
+   - Real-time mobile access via PWA / Web.
+   - Automated 2-way Google Calendar / Outlook background sync.
+================================================================================
