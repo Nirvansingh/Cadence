@@ -10,6 +10,8 @@ import { KanbanModule } from './components/KanbanModule';
 import { NotesModule } from './components/NotesModule';
 import { UtilityModule } from './components/UtilityModule';
 import { CommandPalette } from './components/CommandPalette';
+import { CloudSyncModal } from './components/CloudSyncModal';
+import { cloudSync, type SyncStatus } from './storage/cloudSyncService';
 import { storage } from './storage/storageAdapter';
 import { Check } from 'lucide-react';
 
@@ -19,6 +21,14 @@ export function App() {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => storage.getProfile().soundEnabled);
   const [backupNotice, setBackupNotice] = useState<string | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isCloudSyncOpen, setIsCloudSyncOpen] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>(() => cloudSync.getStatus());
+
+  useEffect(() => {
+    return cloudSync.subscribe((status) => {
+      setSyncStatus(status);
+    });
+  }, []);
 
   // App View Mode: 'landing' | 'onboarding' | 'workspace'
   const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace'>(() => {
@@ -166,6 +176,8 @@ export function App() {
             onExportBackup={handleExportBackup}
             onOpenLanding={() => setViewMode('landing')}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            onOpenCloudSync={() => setIsCloudSyncOpen(true)}
+            syncStatus={syncStatus}
           />
 
           <main key={currentTab} className="animate-pop" style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' }}>
@@ -178,6 +190,15 @@ export function App() {
           </main>
         </div>
       )}
+
+      {/* Cloud Sync Modal */}
+      <CloudSyncModal
+        isOpen={isCloudSyncOpen}
+        onClose={() => setIsCloudSyncOpen(false)}
+        onDataSynced={() => {
+          setProfile(storage.getProfile());
+        }}
+      />
 
       {/* Global Command Palette (Ctrl + K) */}
       <CommandPalette

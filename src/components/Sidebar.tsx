@@ -9,8 +9,10 @@ import {
   Volume2, 
   VolumeX, 
   ArrowDownToLine,
-  Sparkles
+  Sparkles,
+  Cloud
 } from 'lucide-react';
+import type { SyncStatus } from '../storage/cloudSyncService';
 
 export type NavTab = 'habits' | 'timetable' | 'focus' | 'kanban' | 'notes' | 'utilities';
 
@@ -22,6 +24,8 @@ interface SidebarProps {
   onExportBackup: () => void;
   onOpenLanding?: () => void;
   onOpenCommandPalette?: () => void;
+  onOpenCloudSync?: () => void;
+  syncStatus?: SyncStatus;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -31,7 +35,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleSound,
   onExportBackup,
   onOpenLanding,
-  onOpenCommandPalette
+  onOpenCommandPalette,
+  onOpenCloudSync,
+  syncStatus = 'offline'
 }) => {
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'habits', label: 'Daily Habits', icon: <CheckCircle2 size={15} strokeWidth={2} />, color: 'var(--amber)' },
@@ -193,6 +199,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
         flexDirection: 'column',
         gap: '4px'
       }}>
+        {onOpenCloudSync && (
+          <button
+            onClick={onOpenCloudSync}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '7px 10px',
+              borderRadius: 'var(--radius-sm)',
+              color: syncStatus === 'synced' ? 'var(--emerald)' : syncStatus === 'syncing' ? 'var(--sky)' : 'var(--text-muted)',
+              fontSize: '11.5px',
+              transition: 'var(--transition-fast)',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.02)';
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Cloud size={14} color={syncStatus === 'synced' ? 'var(--emerald)' : syncStatus === 'syncing' ? 'var(--sky)' : 'currentColor'} />
+              <span>Cloud Sync</span>
+            </div>
+            <div style={{
+              width: '6px',
+              height: '6px',
+              borderRadius: '50%',
+              backgroundColor: syncStatus === 'synced' ? 'var(--emerald)' : syncStatus === 'syncing' ? 'var(--sky)' : syncStatus === 'error' ? 'var(--rose)' : 'var(--text-muted)'
+            }} />
+          </button>
+        )}
+
         <button
           onClick={onToggleSound}
           style={{
