@@ -31,6 +31,8 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState<'study' | 'coding' | 'health' | 'routine'>('study');
   const [newTimeOfDay, setNewTimeOfDay] = useState<'morning' | 'afternoon' | 'evening' | 'night'>('morning');
+  const [newFrequency, setNewFrequency] = useState<'daily' | 'weekdays'>('daily');
+  const [newStackAfterId, setNewStackAfterId] = useState<string>('');
   const [newCue, setNewCue] = useState('');
   const [newRoutine, setNewRoutine] = useState('');
   const [newReward, setNewReward] = useState('');
@@ -63,12 +65,20 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     }
   };
 
-  const calculateStreak = (habitId: string): number => {
+  const calculateStreak = (habit: Habit): number => {
     let streak = 0;
     const checkDate = new Date();
     for (let i = 0; i < 60; i++) {
+      const dayOfWeek = checkDate.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+      if (habit.frequency === 'weekdays' && isWeekend && i > 0) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        continue;
+      }
+
       const dateStr = checkDate.toISOString().split('T')[0];
-      const hasLog = logs.some(l => l.habitId === habitId && l.completedDate === dateStr);
+      const hasLog = logs.some(l => l.habitId === habit.id && l.completedDate === dateStr);
       if (hasLog) {
         streak++;
       } else if (i > 0) {
@@ -100,6 +110,12 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   const completedTodayCount = habits.filter(h => isHabitCompleted(h.id, todayStr)).length;
   const progressPercent = habits.length > 0 ? Math.round((completedTodayCount / habits.length) * 100) : 0;
 
+  const totalWeeklyCompletions = habits.reduce((acc, h) => {
+    return acc + weekDays.filter(day => isHabitCompleted(h.id, day.dateStr)).length;
+  }, 0);
+  const possibleWeeklyCompletions = (habits.length * 7) || 1;
+  const weeklyConsistency = Math.round((totalWeeklyCompletions / possibleWeeklyCompletions) * 100);
+
   const handleCreateHabit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
@@ -109,11 +125,13 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
       title: newTitle.trim(),
       category: newCategory,
       timeOfDay: newTimeOfDay,
+      frequency: newFrequency,
+      stackAfterHabitId: newStackAfterId || undefined,
       cue: newCue.trim() || 'Trigger context',
       routine: newRoutine.trim() || 'Execute step',
       reward: newReward.trim() || 'Sense of momentum',
       color: newCategory === 'health' ? 'var(--emerald)' : newCategory === 'study' ? 'var(--sky)' : newCategory === 'coding' ? 'var(--violet)' : 'var(--amber)',
-      targetDaysMask: 127,
+      targetDaysMask: newFrequency === 'weekdays' ? 31 : 127,
       sortOrder: habits.length + 1,
       isArchived: false,
       createdAt: Date.now(),
@@ -128,6 +146,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     setNewCue('');
     setNewRoutine('');
     setNewReward('');
+    setNewStackAfterId('');
   };
 
   const handleDeleteHabit = (id: string) => {
@@ -172,7 +191,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
             Daily Habits
           </h2>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            {completedTodayCount} of {habits.length} habits done today • Small daily steps add up
+            {completedTodayCount} of {habits.length} habits done today • {weeklyConsistency}% weekly consistency
           </p>
         </div>
 
@@ -297,8 +316,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
         ) : (
           filteredHabits.map(habit => {
           const completed = isHabitCompleted(habit.id, todayStr);
-          const streak = calculateStreak(habit.id);
+          const streak = calculateStreak(habit);
           const isExpanded = expandedHabitId === habit.id;
+          const parentHabit = habit.stackAfterHabitId ? habits.find(h => h.id === habit.stackAfterHabitId) : null;
 
           return (
             <div
@@ -334,7 +354,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                   </button>
 
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span style={{
                         fontSize: '14.5px',
                         fontWeight: 600,
@@ -345,7 +365,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                         {habit.title}
                       </span>
                       <span style={{
-                        fontSize: '10.5px',
+                        fontSize: '10px',
                         fontWeight: 600,
                         letterSpacing: '0.04em',
                         padding: '1px 7px',
@@ -357,6 +377,32 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                       }} className="mono">
                         {habit.category}
                       </span>
+
+                      {habit.frequency === 'weekdays' && (
+                        <span style={{
+                          fontSize: '10px',
+                          padding: '1px 6px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: 'var(--sky-subtle)',
+                          color: 'var(--sky)',
+                          border: '1px solid var(--sky-border)'
+                        }} className="mono">
+                          Weekdays
+                        </span>
+                      )}
+
+                      {parentHabit && (
+                        <span style={{
+                          fontSize: '10px',
+                          padding: '1px 6px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: 'var(--amber-subtle)',
+                          color: 'var(--amber)',
+                          border: '1px solid var(--amber-border)'
+                        }}>
+                          🔗 After: {parentHabit.title}
+                        </span>
+                      )}
                     </div>
 
                     <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
@@ -602,6 +648,56 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     <option value="afternoon">Afternoon</option>
                     <option value="evening">Evening</option>
                     <option value="night">Night</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <div>
+                  <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                    Schedule Frequency
+                  </label>
+                  <select
+                    value={newFrequency}
+                    onChange={(e) => setNewFrequency(e.target.value as any)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-subtle)',
+                      fontSize: '12.5px',
+                      color: 'var(--text-primary)',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="daily">Every Day (7 Days)</option>
+                    <option value="weekdays">Weekdays Only (Mon-Fri)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
+                    Stack After (Optional)
+                  </label>
+                  <select
+                    value={newStackAfterId}
+                    onChange={(e) => setNewStackAfterId(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-subtle)',
+                      fontSize: '12.5px',
+                      color: 'var(--text-primary)',
+                      outline: 'none'
+                    }}
+                  >
+                    <option value="">No preceding habit</option>
+                    {habits.map(h => (
+                      <option key={h.id} value={h.id}>After "{h.title}"</option>
+                    ))}
                   </select>
                 </div>
               </div>

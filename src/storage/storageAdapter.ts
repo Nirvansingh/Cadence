@@ -1,4 +1,4 @@
-import type { Habit, HabitLog, TimetableSlot, NoteItem, TaskItem, UserProfile, CadenceBackupData } from '../types';
+import type { Habit, HabitLog, TimetableSlot, NoteItem, TaskItem, UserProfile, CadenceBackupData, FocusLog } from '../types';
 
 const STORAGE_KEYS = {
   ONBOARDING_DONE: 'cadence_onboarded_v1',
@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   TIMETABLE: 'cadence_timetable_v1',
   NOTES: 'cadence_notes_v1',
   TASKS: 'cadence_tasks_v1',
+  FOCUS_LOGS: 'cadence_focus_logs_v1',
 };
 
 class LocalStorageAdapter {
@@ -152,6 +153,35 @@ class LocalStorageAdapter {
     localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
   }
 
+  // Focus Sessions
+  getFocusLogs(): FocusLog[] {
+    const raw = localStorage.getItem(STORAGE_KEYS.FOCUS_LOGS);
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
+  setFocusLogs(logs: FocusLog[]): void {
+    localStorage.setItem(STORAGE_KEYS.FOCUS_LOGS, JSON.stringify(logs));
+  }
+
+  addFocusLog(minutes: number): FocusLog {
+    const logs = this.getFocusLogs();
+    const today = new Date().toISOString().split('T')[0];
+    const newLog: FocusLog = {
+      id: `fl_${Date.now()}`,
+      dateStr: today,
+      minutes,
+      timestamp: Date.now()
+    };
+    const updated = [newLog, ...logs];
+    this.setFocusLogs(updated);
+    return newLog;
+  }
+
   // Complete clean slate onboarding initialization
   initializeFromOnboarding(params: {
     displayName: string;
@@ -237,7 +267,8 @@ class LocalStorageAdapter {
       habitLogs: this.getHabitLogs(),
       timetable: this.getTimetable(),
       notes: this.getNotes(),
-      tasks: this.getTasks()
+      tasks: this.getTasks(),
+      focusLogs: this.getFocusLogs()
     };
     return JSON.stringify(data, null, 2);
   }
@@ -251,6 +282,7 @@ class LocalStorageAdapter {
       if (data.timetable) this.setTimetable(data.timetable);
       if (data.notes) this.setNotes(data.notes);
       if (data.tasks) this.setTasks(data.tasks);
+      if (data.focusLogs) this.setFocusLogs(data.focusLogs);
       this.setOnboardingCompleted(true);
       return true;
     } catch {

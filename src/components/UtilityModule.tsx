@@ -101,6 +101,21 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
   const weightedSum = courses.reduce((acc, c) => acc + ((Number(c.credits) || 0) * (Number(c.currentScore) || 0)), 0);
   const currentWeightedAverage = totalCredits > 0 ? (weightedSum / totalCredits).toFixed(1) : '0';
 
+  const percentToGpa = (pct: number): { gpa: string; letter: string } => {
+    if (pct >= 93) return { gpa: '4.00', letter: 'A' };
+    if (pct >= 90) return { gpa: '3.70', letter: 'A-' };
+    if (pct >= 87) return { gpa: '3.30', letter: 'B+' };
+    if (pct >= 83) return { gpa: '3.00', letter: 'B' };
+    if (pct >= 80) return { gpa: '2.70', letter: 'B-' };
+    if (pct >= 77) return { gpa: '2.30', letter: 'C+' };
+    if (pct >= 73) return { gpa: '2.00', letter: 'C' };
+    if (pct >= 70) return { gpa: '1.70', letter: 'C-' };
+    if (pct >= 60) return { gpa: '1.00', letter: 'D' };
+    return { gpa: '0.00', letter: 'F' };
+  };
+
+  const gpaMeta = percentToGpa(parseFloat(currentWeightedAverage) || 0);
+
   const calculateNeededFinal = (current: number, target: number, weight: number): number => {
     if (weight <= 0) return 0;
     const w = weight / 100;
@@ -307,15 +322,22 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
               border: '1px solid var(--border-hairline)'
             }}>
               <div>
-                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block' }}>WEIGHTED AVERAGE</span>
-                <span className="mono" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--emerald)' }}>
+                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block' }}>ESTIMATED GPA</span>
+                <span className="mono" style={{ fontSize: '17px', fontWeight: 700, color: 'var(--emerald)' }}>
+                  {gpaMeta.gpa} ({gpaMeta.letter})
+                </span>
+              </div>
+              <div style={{ height: '24px', width: '1px', backgroundColor: 'var(--border-hairline)' }} />
+              <div>
+                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block' }}>AVG PERCENT</span>
+                <span className="mono" style={{ fontSize: '17px', fontWeight: 700, color: 'var(--sky)' }}>
                   {currentWeightedAverage}%
                 </span>
               </div>
               <div style={{ height: '24px', width: '1px', backgroundColor: 'var(--border-hairline)' }} />
               <div>
-                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block' }}>TOTAL CREDITS</span>
-                <span className="mono" style={{ fontSize: '18px', fontWeight: 700, color: 'var(--sky)' }}>
+                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block' }}>CREDITS</span>
+                <span className="mono" style={{ fontSize: '17px', fontWeight: 700, color: 'var(--amber)' }}>
                   {totalCredits}
                 </span>
               </div>

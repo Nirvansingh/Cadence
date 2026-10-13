@@ -13,10 +13,19 @@ export interface Habit {
   icon?: string;
   color?: string;
   targetDaysMask: number; // 1=Mon, 2=Tue, 4=Wed, 8=Thu, 16=Fri, 32=Sat, 64=Sun (127=daily)
+  frequency?: 'daily' | 'weekdays';
+  stackAfterHabitId?: string;
   sortOrder: number;
   isArchived: boolean;
   createdAt: number;
   updatedAt: number;
+}
+
+export interface FocusLog {
+  id: string;
+  dateStr: string; // 'YYYY-MM-DD'
+  minutes: number;
+  timestamp: number;
 }
 
 export interface HabitLog {
@@ -57,6 +66,12 @@ export interface NoteItem {
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
+export interface Subtask {
+  id: string;
+  title: string;
+  isDone: boolean;
+}
+
 export interface TaskItem {
   id: string;
   title: string;
@@ -65,6 +80,7 @@ export interface TaskItem {
   priority: TaskPriority;
   dueDate?: string;
   tags: string[];
+  subtasks?: Subtask[];
   sortOrder: number;
   createdAt: number;
   updatedAt: number;
@@ -90,4 +106,5 @@ export interface CadenceBackupData {
   timetable: TimetableSlot[];
   notes: NoteItem[];
   tasks: TaskItem[];
+  focusLogs?: FocusLog[];
 }
