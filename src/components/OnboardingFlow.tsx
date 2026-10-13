@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { storage } from '../storage/storageAdapter';
 import { playClickSound, playSuccessChime } from '../utils/sound';
+import confetti from 'canvas-confetti';
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -23,43 +24,39 @@ interface OnboardingFlowProps {
 const FOCUS_PRESETS = [
   {
     id: 'academics',
-    title: 'High School & Academics',
-    description: 'School classes, revision, homework, physics, chemistry & math.',
+    title: 'School & Academics',
+    description: 'Classes, daily homework, revision, and school subjects.',
     icon: <BookOpen size={20} strokeWidth={2} />,
     color: 'var(--sky)',
     bg: 'var(--sky-subtle)',
     border: 'var(--sky-border)',
-    defaultBlock: 'Homework & Revision'
   },
   {
     id: 'competitive',
-    title: 'Competitive Exam Sprint',
-    description: 'Intense question-solving blocks, mock test analysis & formula retention.',
+    title: 'Competitive Exam Prep',
+    description: 'JEE, NEET, SAT, solving practice sets, and formula review.',
     icon: <Award size={20} strokeWidth={2} />,
     color: 'var(--amber)',
     bg: 'var(--amber-subtle)',
     border: 'var(--amber-border)',
-    defaultBlock: 'NCERT & Problem Solving'
   },
   {
     id: 'software',
-    title: 'Software & Code Creation',
-    description: 'Building tools, shipping commits, algorithmic problem sets & architecture.',
+    title: 'Coding & Development',
+    description: 'Learning programming, building apps, and writing code.',
     icon: <Terminal size={20} strokeWidth={2} />,
     color: 'var(--violet)',
     bg: 'var(--violet-subtle)',
     border: 'var(--violet-border)',
-    defaultBlock: 'Coding Sprint'
   },
   {
     id: 'scholar',
-    title: 'Independent Learning',
-    description: 'Self-directed reading, deep writing, language study & research.',
+    title: 'Personal Study & Reading',
+    description: 'Self-directed reading, writing, languages, and creative work.',
     icon: <Feather size={20} strokeWidth={2} />,
     color: 'var(--emerald)',
     bg: 'var(--emerald-subtle)',
     border: 'var(--emerald-border)',
-    defaultBlock: 'Deep Study Block'
   }
 ];
 
@@ -67,24 +64,24 @@ const WAKE_OPTIONS = ['05:30', '06:00', '06:30', '07:00', '07:30', '08:00'];
 const SLEEP_OPTIONS = ['21:30', '22:00', '22:30', '23:00', '23:30', '00:00'];
 
 const TRIGGER_SUGGESTIONS = [
-  'Alarm rings & glass of water',
-  'When arriving home from classes',
-  'Sitting down at desk with coffee',
-  'Dinner is finished at 8:00 PM'
+  'Right after breakfast',
+  'When arriving home from class',
+  'When my morning alarm rings',
+  'After dinner at 8:00 PM'
 ];
 
 const ACTION_SUGGESTIONS = [
-  'Open notebook and solve 3 problems',
-  'Review formula cards for 15 minutes',
-  'Write 25 lines of clean code',
-  'Read 10 pages of required reading'
+  'Solve 3 practice problems',
+  'Review formula notes for 15 mins',
+  'Write 20 lines of clean code',
+  'Read 10 pages of my book'
 ];
 
 const BENEFIT_SUGGESTIONS = [
-  'High exam confidence & zero guilt',
-  'Clear head for the rest of the day',
-  'Tangible skill growth and mastery',
-  'Peaceful restorative sleep'
+  'Confidence for upcoming exams',
+  'Start the day with a clear mind',
+  'Steady progress every day',
+  'Guilt-free relaxation in the evening'
 ];
 
 export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
@@ -104,9 +101,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   const [cue, setCue] = useState(TRIGGER_SUGGESTIONS[0]);
   const [routine, setRoutine] = useState(ACTION_SUGGESTIONS[0]);
   const [reward, setReward] = useState(BENEFIT_SUGGESTIONS[0]);
-  const [habitName, setHabitName] = useState('Morning Problem Set');
+  const [habitName, setHabitName] = useState('Daily Problem Practice');
 
-  // Step 2 Time calculation helpers
   const toMinutes = (timeStr: string) => {
     const [h, m] = timeStr.split(':').map(Number);
     return h * 60 + m;
@@ -142,13 +138,18 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   const handleFinish = (e: React.FormEvent) => {
     e.preventDefault();
     playSuccessChime(soundEnabled);
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.5 }
+    });
 
     storage.initializeFromOnboarding({
       displayName: name.trim() || 'Learner',
       wakeTime,
       sleepTime,
       primaryFocus: selectedFocus.title,
-      firstHabitTitle: habitName.trim() || 'Anchor Routine',
+      firstHabitTitle: habitName.trim() || 'Daily Habit',
       firstHabitCue: cue.trim(),
       firstHabitRoutine: routine.trim(),
       firstHabitReward: reward.trim()
@@ -171,60 +172,67 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
       justifyContent: 'center',
       zIndex: 1000,
       padding: '24px'
-    }} className="animate-quiet">
+    }}>
 
       <div style={{
-        width: '680px',
+        width: '660px',
         backgroundColor: 'var(--bg-surface)',
         border: '1px solid var(--border-hairline)',
         borderRadius: 'var(--radius-lg)',
-        padding: '40px 44px',
+        padding: '36px 40px',
         boxShadow: '0 30px 80px rgba(0, 0, 0, 0.8)',
         display: 'flex',
         flexDirection: 'column',
         position: 'relative'
-      }}>
+      }} className="animate-pop">
 
-        {/* Step Progress Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '32px' }}>
+        {/* Top Step Dots */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
               width: '8px',
               height: '8px',
               borderRadius: '2px',
               backgroundColor: 'var(--emerald)'
-            }} />
+            }} className="pulse-dot" />
             <span style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-muted)' }} className="mono">
-              Workspace Calibration • {currentStep} of 3
+              Step {currentStep} of 3
             </span>
           </div>
 
-          <button
-            onClick={onCancel}
-            style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}
-          >
-            Cancel
-          </button>
+          {/* Stepper Dots */}
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {[1, 2, 3].map(i => (
+              <div
+                key={i}
+                style={{
+                  width: i === currentStep ? '20px' : '6px',
+                  height: '6px',
+                  borderRadius: '3px',
+                  backgroundColor: i <= currentStep ? 'var(--emerald)' : 'var(--bg-subtle)',
+                  transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* ========================================================
-            STEP 1: IDENTITY & PRIMARY CRAFT TILES (NO DROPDOWNS)
-           ======================================================== */}
+        {/* STEP 1: Name & Primary Focus */}
         {currentStep === 1 && (
-          <div>
-            <div style={{ marginBottom: '24px' }}>
+          <div key="step-1" className="animate-pop">
+            <div style={{ marginBottom: '22px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-pure)' }}>
-                Who is using this workspace?
+                Let's set up your workspace
               </h2>
               <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                Your name and learning craft shape your default schedule blocks.
+                Tell us your name and what you're working on so we can organize your day.
               </p>
             </div>
 
             {/* Name Input */}
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: '22px' }}>
               <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="mono">
-                Your Name / Handle
+                What is your name?
               </label>
               <input
                 type="text"
@@ -245,13 +253,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               />
             </div>
 
-            {/* Primary Focus - Interactive Jewel Tiles */}
-            <div style={{ marginBottom: '32px' }}>
+            {/* Focus Cards with Smooth Hover Animation */}
+            <div style={{ marginBottom: '28px' }}>
               <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.05em' }} className="mono">
-                Choose Your Primary Craft
+                What are you studying or working on?
               </label>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {FOCUS_PRESETS.map(preset => {
                   const isSelected = selectedFocus.id === preset.id;
                   return (
@@ -259,16 +267,17 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                       key={preset.id}
                       onClick={() => { setSelectedFocus(preset); playClickSound(soundEnabled); }}
                       style={{
-                        padding: '16px',
+                        padding: '14px 16px',
                         borderRadius: 'var(--radius-sm)',
                         backgroundColor: isSelected ? preset.bg : 'var(--bg-card)',
                         border: '1px solid',
                         borderColor: isSelected ? preset.color : 'var(--border-hairline)',
                         cursor: 'pointer',
-                        transition: 'var(--transition-fast)',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                        transform: isSelected ? 'scale(1.02)' : 'scale(1)',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '8px'
+                        gap: '6px'
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -277,8 +286,8 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                         </div>
                         {isSelected && (
                           <div style={{
-                            width: '16px',
-                            height: '16px',
+                            width: '18px',
+                            height: '18px',
                             borderRadius: '50%',
                             backgroundColor: preset.color,
                             display: 'flex',
@@ -302,8 +311,25 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            {/* Next Button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button
+                type="button"
+                onClick={onCancel}
+                style={{
+                  padding: '9px 14px',
+                  borderRadius: 'var(--radius-xs)',
+                  color: 'var(--text-muted)',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  transition: 'var(--transition-fast)'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+              >
+                Back to Home
+              </button>
+
               <button
                 type="button"
                 onClick={handleNext}
@@ -320,36 +346,34 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   fontWeight: 600,
                   cursor: name.trim() ? 'pointer' : 'not-allowed',
                   boxShadow: name.trim() ? '0 4px 14px rgba(16, 185, 129, 0.25)' : 'none',
-                  transition: 'var(--transition-fast)'
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                <span>Continue to Rhythm</span>
+                <span>Next: Schedule Your Day</span>
                 <ArrowRight size={14} strokeWidth={2.5} />
               </button>
             </div>
           </div>
         )}
 
-        {/* ========================================================
-            STEP 2: TACTILE TIME HORIZON & RHYTHM SELECTOR
-           ======================================================== */}
+        {/* STEP 2: Sleep and Wake Time */}
         {currentStep === 2 && (
-          <div>
-            <div style={{ marginBottom: '24px' }}>
+          <div key="step-2" className="animate-pop">
+            <div style={{ marginBottom: '22px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-pure)' }}>
-                Anchor your daily cycle
+                When do you wake up and sleep?
               </h2>
               <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                Select when your daylight begins and when you wind down for sleep.
+                We'll set your 24-hour timeline and calculate how much free time you have each day.
               </p>
             </div>
 
-            {/* Morning Rise Selector */}
+            {/* Wake Time Pills */}
             <div style={{ marginBottom: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                <Sun size={14} color="var(--amber)" />
-                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-pure)' }}>
-                  Morning Rise Hour
+                <Sun size={15} color="var(--amber)" />
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-pure)' }}>
+                  Wake-Up Time
                 </span>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }} className="mono">
                   ({wakeTime})
@@ -366,7 +390,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                       onClick={() => { setWakeTime(time); playClickSound(soundEnabled); }}
                       style={{
                         flex: 1,
-                        padding: '9px 0',
+                        padding: '10px 0',
                         borderRadius: 'var(--radius-xs)',
                         fontSize: '12.5px',
                         fontWeight: isSel ? 600 : 400,
@@ -374,7 +398,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                         color: isSel ? '#090b10' : 'var(--text-secondary)',
                         border: '1px solid',
                         borderColor: isSel ? 'var(--amber)' : 'var(--border-hairline)',
-                        transition: 'var(--transition-fast)'
+                        transform: isSel ? 'translateY(-2px)' : 'translateY(0)',
+                        boxShadow: isSel ? '0 4px 12px rgba(245, 158, 11, 0.25)' : 'none',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                       }} className="mono"
                     >
                       {time}
@@ -384,12 +410,12 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            {/* Evening Rest Selector */}
-            <div style={{ marginBottom: '28px' }}>
+            {/* Sleep Time Pills */}
+            <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                <Moon size={14} color="var(--sky)" />
-                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-pure)' }}>
-                  Evening Slumber Hour
+                <Moon size={15} color="var(--sky)" />
+                <span style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--text-pure)' }}>
+                  Bedtime
                 </span>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)' }} className="mono">
                   ({sleepTime})
@@ -406,7 +432,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                       onClick={() => { setSleepTime(time); playClickSound(soundEnabled); }}
                       style={{
                         flex: 1,
-                        padding: '9px 0',
+                        padding: '10px 0',
                         borderRadius: 'var(--radius-xs)',
                         fontSize: '12.5px',
                         fontWeight: isSel ? 600 : 400,
@@ -414,7 +440,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                         color: isSel ? '#090b10' : 'var(--text-secondary)',
                         border: '1px solid',
                         borderColor: isSel ? 'var(--sky)' : 'var(--border-hairline)',
-                        transition: 'var(--transition-fast)'
+                        transform: isSel ? 'translateY(-2px)' : 'translateY(0)',
+                        boxShadow: isSel ? '0 4px 12px rgba(56, 189, 248, 0.25)' : 'none',
+                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                       }} className="mono"
                     >
                       {time}
@@ -424,17 +452,27 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            {/* Visual 24-Hour Day Distribution Preview */}
-            <div className="panel" style={{ padding: '16px 20px', marginBottom: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '11px', color: 'var(--text-muted)' }} className="mono">
-                <span>Calculated Day Horizon</span>
-                <span>{awakeHours}h Waking • {sleepHours}h Sleep</span>
+            {/* Live 24h Day Bar with Smooth Transition */}
+            <div className="panel" style={{ padding: '16px 20px', marginBottom: '28px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '11.5px', color: 'var(--text-muted)' }} className="mono">
+                <span>Your Day Breakdown</span>
+                <span style={{ color: 'var(--text-pure)' }}>{sleepHours} hrs sleep • {awakeHours} hrs awake</span>
               </div>
 
-              {/* Dynamic Bar */}
-              <div style={{ height: '16px', borderRadius: '3px', backgroundColor: 'var(--bg-subtle)', overflow: 'hidden', display: 'flex' }}>
-                <div style={{ width: `${(parseFloat(sleepHours) / 24) * 100}%`, height: '100%', backgroundColor: '#64748b' }} title="Sleep Block" />
-                <div style={{ width: `${(parseFloat(awakeHours) / 24) * 100}%`, height: '100%', backgroundColor: 'var(--sky)' }} title="Daylight & Focus Horizon" />
+              {/* Dynamic Animated Bar */}
+              <div style={{ height: '14px', borderRadius: '3px', backgroundColor: 'var(--bg-subtle)', overflow: 'hidden', display: 'flex' }}>
+                <div style={{
+                  width: `${(parseFloat(sleepHours) / 24) * 100}%`,
+                  height: '100%',
+                  backgroundColor: '#64748b',
+                  transition: 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+                }} title="Sleep" />
+                <div style={{
+                  width: `${(parseFloat(awakeHours) / 24) * 100}%`,
+                  height: '100%',
+                  backgroundColor: 'var(--sky)',
+                  transition: 'width 0.35s cubic-bezier(0.16, 1, 0.3, 1)'
+                }} title="Awake" />
               </div>
 
               <div style={{ display: 'flex', gap: '16px', marginTop: '10px', fontSize: '11px', color: 'var(--text-secondary)' }}>
@@ -444,7 +482,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: 'var(--sky)' }} />
-                  <span>Active Waking Horizon ({awakeHours}h)</span>
+                  <span>Awake for classes & study ({awakeHours}h)</span>
                 </div>
               </div>
             </div>
@@ -482,34 +520,32 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   fontSize: '13px',
                   fontWeight: 600,
                   boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
-                  transition: 'var(--transition-fast)'
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                <span>Continue to Anchor Habit</span>
+                <span>Next: Add Your First Habit</span>
                 <ArrowRight size={14} strokeWidth={2.5} />
               </button>
             </div>
           </div>
         )}
 
-        {/* ========================================================
-            STEP 3: THE CONNECTED BEHAVIORAL LOOP ARCHITECT
-           ======================================================== */}
+        {/* STEP 3: Anchor Habit with Connected Flow & Animated Links */}
         {currentStep === 3 && (
-          <form onSubmit={handleFinish}>
+          <form onSubmit={handleFinish} key="step-3" className="animate-pop">
             <div style={{ marginBottom: '20px' }}>
               <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-pure)' }}>
-                Build your anchor routine
+                Pick one small habit to start
               </h2>
               <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                The 2-Minute Rule: Connect a physical trigger to a micro-action so small it's impossible to procrastinate.
+                Make it so small it takes less than 2 minutes to start. Consistency is what matters.
               </p>
             </div>
 
-            {/* Habit Name */}
+            {/* Habit Title */}
             <div style={{ marginBottom: '16px' }}>
               <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', display: 'block', marginBottom: '4px', textTransform: 'uppercase' }} className="mono">
-                Routine Title
+                Habit Name
               </label>
               <input
                 type="text"
@@ -531,9 +567,9 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
             {/* Connected Node 1: Trigger */}
             <div style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--amber)' }} />
-                <span style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--amber)' }}>
-                  1. The Trigger (When / Context)
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'var(--amber)' }} />
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--amber)' }}>
+                  1. When does it happen? (The Trigger)
                 </span>
               </div>
               <input
@@ -552,18 +588,20 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 }}
               />
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                {TRIGGER_SUGGESTIONS.slice(0, 3).map((sug, i) => (
+                {TRIGGER_SUGGESTIONS.map((sug, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setCue(sug)}
                     style={{
-                      padding: '2px 8px',
+                      padding: '3px 9px',
                       borderRadius: 'var(--radius-pill)',
-                      backgroundColor: 'var(--bg-card)',
-                      color: 'var(--text-muted)',
+                      backgroundColor: cue === sug ? 'var(--amber-subtle)' : 'var(--bg-card)',
+                      color: cue === sug ? 'var(--amber)' : 'var(--text-muted)',
                       fontSize: '10.5px',
-                      border: '1px solid var(--border-hairline)'
+                      border: '1px solid',
+                      borderColor: cue === sug ? 'var(--amber)' : 'var(--border-hairline)',
+                      transition: 'all 0.15s ease'
                     }}
                   >
                     + {sug}
@@ -572,12 +610,12 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            {/* Connected Node 2: Micro-Step */}
+            {/* Connected Node 2: The Action */}
             <div style={{ marginBottom: '14px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--sky)' }} />
-                <span style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--sky)' }}>
-                  2. The Micro-Step (Small action)
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'var(--sky)' }} />
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--sky)' }}>
+                  2. What is the small step? (The Action)
                 </span>
               </div>
               <input
@@ -596,18 +634,20 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 }}
               />
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                {ACTION_SUGGESTIONS.slice(0, 3).map((sug, i) => (
+                {ACTION_SUGGESTIONS.map((sug, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setRoutine(sug)}
                     style={{
-                      padding: '2px 8px',
+                      padding: '3px 9px',
                       borderRadius: 'var(--radius-pill)',
-                      backgroundColor: 'var(--bg-card)',
-                      color: 'var(--text-muted)',
+                      backgroundColor: routine === sug ? 'var(--sky-subtle)' : 'var(--bg-card)',
+                      color: routine === sug ? 'var(--sky)' : 'var(--text-muted)',
                       fontSize: '10.5px',
-                      border: '1px solid var(--border-hairline)'
+                      border: '1px solid',
+                      borderColor: routine === sug ? 'var(--sky)' : 'var(--border-hairline)',
+                      transition: 'all 0.15s ease'
                     }}
                   >
                     + {sug}
@@ -616,12 +656,12 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            {/* Connected Node 3: Payoff */}
-            <div style={{ marginBottom: '28px' }}>
+            {/* Connected Node 3: The Reward */}
+            <div style={{ marginBottom: '26px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--emerald)' }} />
-                <span style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--emerald)' }}>
-                  3. The Psychological Payoff (Why it feels good)
+                <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: 'var(--emerald)' }} />
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--emerald)' }}>
+                  3. Why does it help? (The Payoff)
                 </span>
               </div>
               <input
@@ -640,18 +680,20 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 }}
               />
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                {BENEFIT_SUGGESTIONS.slice(0, 3).map((sug, i) => (
+                {BENEFIT_SUGGESTIONS.map((sug, i) => (
                   <button
                     key={i}
                     type="button"
                     onClick={() => setReward(sug)}
                     style={{
-                      padding: '2px 8px',
+                      padding: '3px 9px',
                       borderRadius: 'var(--radius-pill)',
-                      backgroundColor: 'var(--bg-card)',
-                      color: 'var(--text-muted)',
+                      backgroundColor: reward === sug ? 'var(--emerald-subtle)' : 'var(--bg-card)',
+                      color: reward === sug ? 'var(--emerald)' : 'var(--text-muted)',
                       fontSize: '10.5px',
-                      border: '1px solid var(--border-hairline)'
+                      border: '1px solid',
+                      borderColor: reward === sug ? 'var(--emerald)' : 'var(--border-hairline)',
+                      transition: 'all 0.15s ease'
                     }}
                   >
                     + {sug}
@@ -660,7 +702,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               </div>
             </div>
 
-            {/* Action Row */}
+            {/* Actions */}
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <button
                 type="button"
@@ -692,11 +734,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   fontSize: '13.5px',
                   fontWeight: 600,
                   boxShadow: '0 4px 18px rgba(16, 185, 129, 0.35)',
-                  transition: 'var(--transition-fast)'
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
                 <Sparkles size={16} />
-                <span>Initialize My Cadence</span>
+                <span>Finish & Open Workspace</span>
               </button>
             </div>
           </form>

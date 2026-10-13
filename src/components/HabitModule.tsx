@@ -139,7 +139,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   return (
     <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1000px', margin: '0 auto' }}>
       {/* Header Banner - Rich Contrast & Depth */}
-      <div style={{
+      <div className="panel-interactive" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -169,10 +169,10 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
           </div>
 
           <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-pure)' }}>
-            Daily Ledger
+            Daily Habits
           </h2>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            {completedTodayCount} of {habits.length} routines completed • Atomic behavioral loops
+            {completedTodayCount} of {habits.length} habits done today • Small daily steps add up
           </p>
         </div>
 
@@ -198,7 +198,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                 strokeDasharray={188.5}
                 strokeDashoffset={188.5 - (188.5 * progressPercent) / 100}
                 strokeLinecap="round"
-                style={{ transition: 'stroke-dashoffset 0.4s ease' }}
+                style={{ transition: 'stroke-dashoffset 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }}
               />
             </svg>
             <div style={{
@@ -233,11 +233,17 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
               boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
               transition: 'var(--transition-fast)'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#34d399'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--emerald)'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#34d399';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--emerald)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
           >
             <Plus size={15} strokeWidth={2.5} />
-            <span>Add Routine</span>
+            <span>New Habit</span>
           </button>
         </div>
       </div>
@@ -245,10 +251,10 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
       {/* Filter Tabs */}
       <div style={{ display: 'flex', gap: '6px', marginBottom: '20px' }}>
         {[
-          { id: 'all', label: 'All Routines' },
+          { id: 'all', label: 'All Habits' },
           { id: 'morning', label: 'Morning' },
-          { id: 'study', label: 'Study & Academics' },
-          { id: 'coding', label: 'Development' },
+          { id: 'study', label: 'Study' },
+          { id: 'coding', label: 'Coding' },
           { id: 'routine', label: 'Evening' },
         ].map(filter => {
           const isSel = selectedFilter === filter.id;
@@ -285,8 +291,8 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
             border: '1px dashed var(--border-hairline)',
             color: 'var(--text-muted)'
           }}>
-            <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>No routines scheduled yet.</p>
-            <p style={{ fontSize: '12px', marginTop: '4px', color: 'var(--text-muted)' }}>Click "Add Routine" to create your first behavioral loop.</p>
+            <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)' }}>No habits added yet.</p>
+            <p style={{ fontSize: '12px', marginTop: '4px', color: 'var(--text-muted)' }}>Click "New Habit" to start with one simple daily goal.</p>
           </div>
         ) : (
           filteredHabits.map(habit => {
@@ -419,7 +425,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text-pure)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
                   >
-                    <span>Blueprint</span>
+                    <span>Details</span>
                     {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                   </button>
 
@@ -439,9 +445,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                 </div>
               </div>
 
-              {/* Habit Loop Drawer Accordion */}
+              {/* Habit Loop Drawer Accordion with Smooth Fade In */}
               {isExpanded && (
-                <div style={{
+                <div className="animate-pop" style={{
                   marginTop: '16px',
                   paddingTop: '16px',
                   borderTop: '1px solid var(--border-hairline)',
@@ -456,9 +462,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     backgroundColor: 'var(--amber-subtle)',
                     border: '1px solid var(--amber-border)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--amber)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--amber)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.03em' }}>
                       <Zap size={13} />
-                      <span>1. Trigger Cue</span>
+                      <span>1. When (Trigger)</span>
                     </div>
                     <p style={{ fontSize: '12.5px', color: 'var(--text-pure)', marginTop: '4px' }}>
                       {habit.cue}
@@ -472,9 +478,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     backgroundColor: 'var(--sky-subtle)',
                     border: '1px solid var(--sky-border)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--sky)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--sky)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.03em' }}>
                       <RotateCcw size={13} />
-                      <span>2. Micro Action</span>
+                      <span>2. Small Step</span>
                     </div>
                     <p style={{ fontSize: '12.5px', color: 'var(--text-pure)', marginTop: '4px' }}>
                       {habit.routine}
@@ -488,9 +494,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     backgroundColor: 'var(--emerald-subtle)',
                     border: '1px solid var(--emerald-border)'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--emerald)', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--emerald)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.03em' }}>
                       <Gift size={13} />
-                      <span>3. Psychological Benefit</span>
+                      <span>3. Why It Helps</span>
                     </div>
                     <p style={{ fontSize: '12.5px', color: 'var(--text-pure)', marginTop: '4px' }}>
                       {habit.reward}
@@ -519,7 +525,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
           justifyContent: 'center',
           zIndex: 1000
         }}>
-          <div style={{
+          <div className="animate-pop" style={{
             width: '450px',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
@@ -527,13 +533,13 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
             padding: '26px'
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-pure)', marginBottom: '16px' }}>
-              Add Daily Routine
+              Add a New Habit
             </h3>
 
             <form onSubmit={handleCreateHabit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                  Routine Title
+                  Habit Name
                 </label>
                 <input
                   type="text"
@@ -570,7 +576,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     }}
                   >
                     <option value="study">Study</option>
-                    <option value="coding">Development</option>
+                    <option value="coding">Coding</option>
                     <option value="health">Health</option>
                     <option value="routine">Routine</option>
                   </select>
@@ -602,11 +608,11 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
 
               <div>
                 <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--amber)', display: 'block', marginBottom: '4px' }}>
-                  1. The Trigger / Cue
+                  1. When does this happen? (Trigger)
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. When arriving home from class at 4:30 PM"
+                  placeholder="e.g. Right after arriving home from class"
                   value={newCue}
                   onChange={(e) => setNewCue(e.target.value)}
                   style={{
@@ -622,11 +628,11 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
 
               <div>
                 <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--sky)', display: 'block', marginBottom: '4px' }}>
-                  2. Micro-Step
+                  2. What is the small step?
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Open textbook and solve 5 problems"
+                  placeholder="e.g. Open textbook and solve 3 problems"
                   value={newRoutine}
                   onChange={(e) => setNewRoutine(e.target.value)}
                   style={{
@@ -642,11 +648,11 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
 
               <div>
                 <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--emerald)', display: 'block', marginBottom: '4px' }}>
-                  3. Psychological Payoff
+                  3. Why does this help?
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Reduced anxiety and peaceful evening"
+                  placeholder="e.g. Feel ready for exams and relax peacefully"
                   value={newReward}
                   onChange={(e) => setNewReward(e.target.value)}
                   style={{
@@ -676,15 +682,19 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                 <button
                   type="submit"
                   style={{
-                    padding: '8px 16px',
+                    padding: '8px 18px',
                     borderRadius: 'var(--radius-xs)',
                     backgroundColor: 'var(--emerald)',
                     color: '#090b10',
                     fontSize: '12.5px',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    boxShadow: '0 2px 10px rgba(16, 185, 129, 0.25)',
+                    transition: 'var(--transition-fast)'
                   }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#34d399'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--emerald)'; }}
                 >
-                  Save Routine
+                  Save Habit
                 </button>
               </div>
             </form>

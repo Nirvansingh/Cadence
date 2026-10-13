@@ -20,12 +20,12 @@ const DAYS: DayOfWeek[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday
 // Rich, high-contrast jewel palette for timetable
 const CATEGORY_PALETTE: Record<TimetableCategory, { hex: string; label: string; text: string; bg: string }> = {
   school: { hex: '#f43f5e', label: 'School', text: '#f43f5e', bg: 'rgba(244, 63, 94, 0.12)' },
-  tuition: { hex: '#f59e0b', label: 'Tuition', text: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
-  study: { hex: '#38bdf8', label: 'Study Block', text: '#38bdf8', bg: 'rgba(56, 189, 248, 0.12)' },
+  tuition: { hex: '#f59e0b', label: 'Classes / Tuition', text: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
+  study: { hex: '#38bdf8', label: 'Study Time', text: '#38bdf8', bg: 'rgba(56, 189, 248, 0.12)' },
   workout: { hex: '#10b981', label: 'Exercise', text: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
   meals: { hex: '#8b5cf6', label: 'Meals & Break', text: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.12)' },
   sleep: { hex: '#64748b', label: 'Sleep & Rest', text: '#94a3b8', bg: 'rgba(100, 116, 139, 0.15)' },
-  other: { hex: '#94a3b8', label: 'Transit Buffer', text: '#cbd5e1', bg: 'rgba(148, 163, 184, 0.12)' }
+  other: { hex: '#94a3b8', label: 'Break / Travel', text: '#cbd5e1', bg: 'rgba(148, 163, 184, 0.12)' }
 };
 
 export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }) => {
@@ -101,7 +101,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
   return (
     <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1000px', margin: '0 auto' }}>
       {/* Header Block */}
-      <div style={{
+      <div className="panel-interactive" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -126,13 +126,13 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
             marginBottom: '6px'
           }}>
             <Clock size={12} />
-            Free Time Remaining: {freeHours} hrs
+            {freeHours} hours free time today
           </span>
           <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-pure)' }}>
-            24-Hour Timetable
+            Daily Schedule
           </h2>
           <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-            Day-by-day schedule with transit buffers & RFC 5545 calendar sync
+            Plan your day hour-by-hour • Export directly to Google or Apple Calendar
           </p>
         </div>
 
@@ -152,11 +152,17 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
               border: '1px solid var(--border-subtle)',
               transition: 'var(--transition-fast)'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-focus)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-focus)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
           >
             <ArrowDownToLine size={14} />
-            <span>Export .ICS</span>
+            <span>Export Calendar</span>
           </button>
 
           <button
@@ -174,11 +180,17 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
               boxShadow: '0 4px 14px rgba(56, 189, 248, 0.25)',
               transition: 'var(--transition-fast)'
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#7dd3fc'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--sky)'; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#7dd3fc';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--sky)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
           >
             <Plus size={15} strokeWidth={2.5} />
-            <span>Add Block</span>
+            <span>Add Event</span>
           </button>
         </div>
       </div>
@@ -391,7 +403,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
           justifyContent: 'center',
           zIndex: 1000
         }}>
-          <div style={{
+          <div className="animate-pop" style={{
             width: '440px',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
@@ -399,17 +411,17 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
             padding: '26px'
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-pure)', marginBottom: '16px' }}>
-              Add Time Block ({selectedDay})
+              Add Schedule Event ({selectedDay})
             </h3>
 
             <form onSubmit={handleCreateSlot} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div>
                 <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                  Block Title
+                  Event Name
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Physics Class / Self-Study"
+                  placeholder="e.g. Physics Class or Self Study"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   style={{
@@ -427,7 +439,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
                   <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                    Start (24h)
+                    Start Time
                   </label>
                   <input
                     type="time"
@@ -446,7 +458,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
 
                 <div>
                   <label style={{ fontSize: '11.5px', fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-                    End (24h)
+                    End Time
                   </label>
                   <input
                     type="time"
@@ -481,12 +493,12 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                   }}
                 >
                   <option value="school">School</option>
-                  <option value="tuition">Tuition</option>
-                  <option value="study">Study Block</option>
+                  <option value="tuition">Classes / Tuition</option>
+                  <option value="study">Study Time</option>
                   <option value="workout">Exercise</option>
                   <option value="meals">Meals & Break</option>
                   <option value="sleep">Sleep & Rest</option>
-                  <option value="other">Transit Buffer</option>
+                  <option value="other">Break / Travel</option>
                 </select>
               </div>
 
@@ -526,15 +538,19 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                 <button
                   type="submit"
                   style={{
-                    padding: '8px 16px',
+                    padding: '8px 18px',
                     borderRadius: 'var(--radius-xs)',
                     backgroundColor: 'var(--sky)',
                     color: '#090b10',
                     fontSize: '12.5px',
-                    fontWeight: 600
+                    fontWeight: 600,
+                    boxShadow: '0 2px 10px rgba(56, 189, 248, 0.25)',
+                    transition: 'var(--transition-fast)'
                   }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#7dd3fc'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--sky)'; }}
                 >
-                  Save Block
+                  Save Event
                 </button>
               </div>
             </form>

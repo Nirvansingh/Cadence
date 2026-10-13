@@ -33,8 +33,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'habits', label: 'Daily Habits', icon: <CheckCircle2 size={15} strokeWidth={2} />, color: 'var(--amber)' },
-    { id: 'timetable', label: 'Schedule & 24h', icon: <Calendar size={15} strokeWidth={2} />, color: 'var(--sky)' },
-    { id: 'focus', label: 'Focus & Sound', icon: <Clock size={15} strokeWidth={2} />, color: 'var(--violet)' },
+    { id: 'timetable', label: 'Schedule', icon: <Calendar size={15} strokeWidth={2} />, color: 'var(--sky)' },
+    { id: 'focus', label: 'Study Timer', icon: <Clock size={15} strokeWidth={2} />, color: 'var(--violet)' },
     { id: 'kanban', label: 'Tasks', icon: <Kanban size={15} strokeWidth={2} />, color: 'var(--emerald)' },
     { id: 'notes', label: 'Notebook', icon: <BookOpen size={15} strokeWidth={2} />, color: 'var(--rose)' },
     { id: 'utilities', label: 'Tools', icon: <Sliders size={15} strokeWidth={2} />, color: 'var(--text-secondary)' },
@@ -72,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </h1>
         </div>
         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', letterSpacing: '0.01em' }}>
-          Daily Operating System
+          Daily Student Workspace
         </p>
       </div>
 
@@ -172,7 +172,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
         >
           {soundEnabled ? <Volume2 size={14} color="var(--emerald)" /> : <VolumeX size={14} />}
-          <span>Audio Feedback: {soundEnabled ? 'Active' : 'Muted'}</span>
+          <span>Sound: {soundEnabled ? 'On' : 'Off'}</span>
         </button>
 
         <button
@@ -197,7 +197,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
         >
           <ArrowDownToLine size={14} />
-          <span>Save Backup (JSON)</span>
+          <span>Export Backup</span>
         </button>
 
         {onOpenLanding && (
@@ -223,7 +223,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           >
             <Sparkles size={14} color="var(--amber)" />
-            <span>Tour & Setup Wizard</span>
+            <span>Welcome & Setup</span>
           </button>
         )}
       </div>

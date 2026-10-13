@@ -18,9 +18,9 @@ interface FocusModuleProps {
 type TimerPreset = { label: string; focusMinutes: number; breakMinutes: number };
 
 const PRESETS: TimerPreset[] = [
-  { label: '25m Pomodoro', focusMinutes: 25, breakMinutes: 5 },
-  { label: '45m Class Block', focusMinutes: 45, breakMinutes: 15 },
-  { label: '90m Deep Work', focusMinutes: 90, breakMinutes: 20 },
+  { label: '25 min Focus', focusMinutes: 25, breakMinutes: 5 },
+  { label: '45 min Study', focusMinutes: 45, breakMinutes: 15 },
+  { label: '90 min Deep Focus', focusMinutes: 90, breakMinutes: 20 },
 ];
 
 export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
@@ -180,10 +180,10 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
               fontWeight: 600,
               marginBottom: '6px'
             }}>
-              {isBreak ? 'Resting / Buffer Interval' : 'Deep Focus & Flow State'}
+              {isBreak ? 'Break Time • Take a breath' : 'Focus Session • Stay in the zone'}
             </span>
             <h2 style={{ fontSize: '24px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text-pure)' }}>
-              Focus Studio
+              Study Timer
             </h2>
           </div>
 
@@ -200,7 +200,7 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
                 transition: 'var(--transition-fast)'
               }}
             >
-              Intervals
+              Timer
             </button>
             <button
               onClick={() => { setActiveTab('stopwatch'); playClickSound(soundEnabled); }}
@@ -297,7 +297,7 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
               textTransform: 'uppercase',
               marginBottom: '32px'
             }} className="mono">
-              {isBreak ? 'Rest & Decompression' : 'Deep Study Sprint'}
+              {isBreak ? 'Break Time • Relax' : 'Study Session • Focus'}
             </p>
 
             {/* Controls */}
@@ -324,6 +324,7 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
 
               <button
                 onClick={toggleTimer}
+                className={isRunning ? 'pulse-ring' : ''}
                 style={{
                   width: '58px',
                   height: '58px',
@@ -445,10 +446,10 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
           </div>
           <div>
             <h4 style={{ fontSize: '13.5px', fontWeight: 600, color: 'var(--text-pure)' }}>
-              Procedural Background Audio
+              Calm Background Audio
             </h4>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              100% offline Web Audio synthesizer • Zero streaming lag
+              Gentle sound to block out noise while you study • 100% offline
             </p>
           </div>
         </div>

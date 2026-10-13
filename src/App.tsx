@@ -153,7 +153,7 @@ export function App() {
             onOpenLanding={() => setViewMode('landing')}
           />
 
-          <main style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' }}>
+          <main key={currentTab} className="animate-pop" style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' }}>
             {currentTab === 'habits' && <HabitModule soundEnabled={soundEnabled} />}
             {currentTab === 'timetable' && <TimetableModule soundEnabled={soundEnabled} />}
             {currentTab === 'focus' && <FocusModule soundEnabled={soundEnabled} />}
