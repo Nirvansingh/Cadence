@@ -25,6 +25,7 @@ interface SidebarProps {
   onOpenLanding?: () => void;
   onOpenCommandPalette?: () => void;
   onOpenCloudSync?: () => void;
+  onOpenAuth?: () => void;
   syncStatus?: SyncStatus;
 }
 
@@ -37,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenLanding,
   onOpenCommandPalette,
   onOpenCloudSync,
+  onOpenAuth,
   syncStatus = 'offline'
 }) => {
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
@@ -199,9 +201,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         flexDirection: 'column',
         gap: '4px'
       }}>
-        {onOpenCloudSync && (
+        {(onOpenCloudSync || onOpenAuth) && (
           <button
-            onClick={onOpenCloudSync}
+            onClick={() => {
+              if (onOpenAuth) onOpenAuth();
+              else onOpenCloudSync?.();
+            }}
             style={{
               display: 'flex',
               alignItems: 'center',

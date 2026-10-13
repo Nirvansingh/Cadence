@@ -14,12 +14,14 @@ interface LandingPageProps {
   onStartSetup: () => void;
   onExploreDirectly: () => void;
   onImportBackup: () => void;
+  onOpenAuth?: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onStartSetup,
   onExploreDirectly,
-  onImportBackup
+  onImportBackup,
+  onOpenAuth
 }) => {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
 
@@ -83,6 +85,36 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          {onOpenAuth && (
+            <button
+              onClick={onOpenAuth}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--emerald)',
+                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                padding: '7px 14px',
+                borderRadius: 'var(--radius-xs)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                transition: 'var(--transition-fast)',
+                cursor: 'pointer'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.16)';
+                e.currentTarget.style.transform = 'translateY(-1px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.08)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              <span>Sign In / Cloud Sync</span>
+            </button>
+          )}
+
           <button
             onClick={onImportBackup}
             style={{

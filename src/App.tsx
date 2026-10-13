@@ -11,6 +11,7 @@ import { NotesModule } from './components/NotesModule';
 import { UtilityModule } from './components/UtilityModule';
 import { CommandPalette } from './components/CommandPalette';
 import { CloudSyncModal } from './components/CloudSyncModal';
+import { AuthPage } from './components/AuthPage';
 import { cloudSync, type SyncStatus } from './storage/cloudSyncService';
 import { storage } from './storage/storageAdapter';
 import { Check } from 'lucide-react';
@@ -30,8 +31,8 @@ export function App() {
     });
   }, []);
 
-  // App View Mode: 'landing' | 'onboarding' | 'workspace'
-  const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace'>(() => {
+  // App View Mode: 'landing' | 'onboarding' | 'workspace' | 'auth'
+  const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace' | 'auth'>(() => {
     return storage.isOnboardingCompleted() ? 'workspace' : 'landing';
   });
 
@@ -153,6 +154,7 @@ export function App() {
             setViewMode('workspace');
           }}
           onImportBackup={handleTriggerImport}
+          onOpenAuth={() => setViewMode('auth')}
         />
       )}
 
@@ -177,6 +179,7 @@ export function App() {
             onOpenLanding={() => setViewMode('landing')}
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
             onOpenCloudSync={() => setIsCloudSyncOpen(true)}
+            onOpenAuth={() => setViewMode('auth')}
             syncStatus={syncStatus}
           />
 
@@ -191,6 +194,17 @@ export function App() {
         </div>
       )}
 
+      {/* View Mode 4: Dedicated 1/3 Split Cloudflare-Style Auth Portal */}
+      {viewMode === 'auth' && (
+        <AuthPage
+          onBackToWorkspace={() => setViewMode('workspace')}
+          onSuccess={() => {
+            setProfile(storage.getProfile());
+            setViewMode('workspace');
+          }}
+        />
+      )}
+
       {/* Cloud Sync Modal */}
       <CloudSyncModal
         isOpen={isCloudSyncOpen}
@@ -198,6 +212,7 @@ export function App() {
         onDataSynced={() => {
           setProfile(storage.getProfile());
         }}
+        onOpenFullscreenAuth={() => setViewMode('auth')}
       />
 
       {/* Global Command Palette (Ctrl + K) */}

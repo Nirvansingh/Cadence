@@ -7,12 +7,14 @@ interface CloudSyncModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDataSynced?: () => void;
+  onOpenFullscreenAuth?: () => void;
 }
 
 export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
   isOpen,
   onClose,
-  onDataSynced
+  onDataSynced,
+  onOpenFullscreenAuth
 }) => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
@@ -483,6 +485,29 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                   Cadence remains 100% functional offline without an account. Cloud sync is optional for multi-device synchronization.
                 </span>
               </div>
+
+              {onOpenFullscreenAuth && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenFullscreenAuth();
+                  }}
+                  style={{
+                    width: '100%',
+                    marginTop: '12px',
+                    padding: '8px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-hairline)',
+                    color: 'var(--sky)',
+                    fontSize: '11.5px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Open Fullscreen Login Portal (with Network Animation) →
+                </button>
+              )}
             </div>
           )}
         </div>
