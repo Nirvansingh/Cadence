@@ -11,9 +11,6 @@ import {
   CheckCircle2, 
   AlertCircle, 
   ShieldCheck, 
-  Cloud, 
-  Sparkles,
-  Zap,
   RefreshCw
 } from 'lucide-react';
 
@@ -599,125 +596,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             display: 'block'
           }}
         />
-
-        {/* Floating Feature Telemetry Cards (Cloudflare / Network style) */}
-        <div style={{
-          position: 'relative',
-          zIndex: 5,
-          maxWidth: '560px',
-          padding: '0 32px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          pointerEvents: 'none'
-        }}>
-          {/* Badge */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            backgroundColor: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            color: 'var(--emerald)',
-            fontSize: '11.5px',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
-            width: 'fit-content'
-          }}>
-            <Sparkles size={13} />
-            <span>Zero-Latency Mesh Sync</span>
-          </div>
-
-          <h2 style={{
-            fontSize: '34px',
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
-            color: '#ffffff',
-            lineHeight: 1.15,
-            textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)'
-          }}>
-            Your student workspace, instantly synchronized.
-          </h2>
-
-          <p style={{
-            fontSize: '14.5px',
-            color: 'rgba(255, 255, 255, 0.65)',
-            lineHeight: 1.6
-          }}>
-            Local-first by design. Keep your class schedule, weekly habits, Pomodoro blocks, and kanban cards always in sync across desktop, tablet, and mobile.
-          </p>
-
-          {/* Micro Cards Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '14px',
-            marginTop: '8px'
-          }}>
-            <div style={{
-              padding: '16px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'rgba(15, 23, 42, 0.65)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--sky)', marginBottom: '6px' }}>
-                <Cloud size={16} />
-                <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>Continuous Sync</span>
-              </div>
-              <p style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.55)', lineHeight: 1.4, margin: 0 }}>
-                Changes made offline merge seamlessly the second you connect.
-              </p>
-            </div>
-
-            <div style={{
-              padding: '16px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'rgba(15, 23, 42, 0.65)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--emerald)', marginBottom: '6px' }}>
-                <Zap size={16} />
-                <span style={{ fontSize: '12.5px', fontWeight: 600, color: '#fff' }}>100% Free Forever</span>
-              </div>
-              <p style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.55)', lineHeight: 1.4, margin: 0 }}>
-                Built on open standards and generous free tiers for students.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Floating status beacon in corner */}
-        <div style={{
-          position: 'absolute',
-          bottom: '24px',
-          right: '28px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 12px',
-          borderRadius: '16px',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          fontSize: '11px',
-          color: 'rgba(255, 255, 255, 0.6)'
-        }}>
-          <div style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--emerald)',
-            boxShadow: '0 0 8px var(--emerald)'
-          }} />
-          <span>Supabase Edge Mesh: Online</span>
-        </div>
       </div>
     </div>
   );

@@ -6,7 +6,6 @@ import {
   ArrowRight, 
   ArrowLeft, 
   Check, 
-  Sparkles, 
   BookOpen, 
   Terminal, 
   Award, 
@@ -737,7 +736,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                <Sparkles size={16} />
+                <Check size={16} />
                 <span>Finish & Open Workspace</span>
               </button>
             </div>

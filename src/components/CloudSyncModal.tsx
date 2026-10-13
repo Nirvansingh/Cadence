@@ -505,7 +505,7 @@ export const CloudSyncModal: React.FC<CloudSyncModalProps> = ({
                     cursor: 'pointer'
                   }}
                 >
-                  Open Fullscreen Login Portal (with Network Animation) →
+                  Open Fullscreen Login Page →
                 </button>
               )}
             </div>

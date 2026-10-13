@@ -10,8 +10,7 @@ import {
   Trash2, 
   Check, 
   AlertTriangle,
-  Layers,
-  Sparkles
+  Layers
 } from 'lucide-react';
 
 interface TimetableModuleProps {
@@ -284,7 +283,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
               cursor: 'pointer'
             }}
           >
-            <Sparkles size={13} color="var(--amber)" />
+            <Clock size={13} color="var(--sky)" />
             <span>Add Buffers</span>
           </button>
 

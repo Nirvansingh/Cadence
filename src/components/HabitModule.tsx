@@ -400,7 +400,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                           color: 'var(--amber)',
                           border: '1px solid var(--amber-border)'
                         }}>
-                          🔗 After: {parentHabit.title}
+                          After: {parentHabit.title}
                         </span>
                       )}
                     </div>

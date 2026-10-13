@@ -9,7 +9,7 @@ import {
   Volume2, 
   VolumeX, 
   ArrowDownToLine,
-  Sparkles,
+  Compass,
   Cloud
 } from 'lucide-react';
 import type { SyncStatus } from '../storage/cloudSyncService';
@@ -310,7 +310,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               e.currentTarget.style.color = 'var(--text-muted)';
             }}
           >
-            <Sparkles size={14} color="var(--amber)" />
+            <Compass size={14} color="var(--text-muted)" />
             <span>Welcome & Setup</span>
           </button>
         )}

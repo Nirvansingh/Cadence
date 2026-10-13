@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { NavTab } from './Sidebar';
 import { 
   Search, 
-  Sparkles, 
   CheckSquare, 
   Calendar, 
   Timer, 
@@ -355,8 +354,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             <span><strong style={{ color: 'var(--text-secondary)' }}>↵</strong> Select</span>
             <span><strong style={{ color: 'var(--text-secondary)' }}>ESC</strong> Close</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Sparkles size={12} color="var(--amber)" />
+          <div>
             <span>Cadence Quick Switcher</span>
           </div>
         </div>
