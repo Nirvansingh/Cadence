@@ -5,12 +5,10 @@ import {
   GraduationCap, 
   ArrowLeftRight, 
   QrCode, 
-  Code2, 
   Copy, 
   Check, 
   Plus, 
-  Trash2, 
-  Sparkles
+  Trash2
 } from 'lucide-react';
 
 interface UtilityModuleProps {
@@ -27,19 +25,14 @@ interface CourseItem {
 }
 
 export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) => {
-  const [activeTab, setActiveTab] = useState<'calc' | 'gpa' | 'converter' | 'qr' | 'json'>('calc');
+  const [activeTab, setActiveTab] = useState<'calc' | 'gpa' | 'converter' | 'qr'>('calc');
 
   // Calculator State
   const [calcDisplay, setCalcDisplay] = useState('0');
 
   // QR Code State
   const [qrText, setQrText] = useState('https://github.com');
-
-  // JSON Formatter State
-  const [jsonInput, setJsonInput] = useState('{"title": "Cadence", "offline": true, "version": 1}');
-  const [jsonOutput, setJsonOutput] = useState('');
-  const [jsonError, setJsonError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [copiedVal, setCopiedVal] = useState<string | null>(null);
 
   // GPA & Target Exam State
   const [courses, setCourses] = useState<CourseItem[]>([
@@ -97,20 +90,10 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
     }
   };
 
-  const handleFormatJson = () => {
-    try {
-      const parsed = JSON.parse(jsonInput);
-      setJsonOutput(JSON.stringify(parsed, null, 2));
-      setJsonError('');
-    } catch (err: any) {
-      setJsonError(err.message || 'Invalid JSON syntax');
-    }
-  };
-
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedVal(text);
+    setTimeout(() => setCopiedVal(null), 1500);
   };
 
   // GPA Calculation Helper
@@ -205,8 +188,7 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
             { id: 'calc', label: 'Calculator', icon: <CalcIcon size={13} /> },
             { id: 'gpa', label: 'GPA & Final Exam Target', icon: <GraduationCap size={13} /> },
             { id: 'converter', label: 'Unit & Base Converter', icon: <ArrowLeftRight size={13} /> },
-            { id: 'qr', label: 'QR Code', icon: <QrCode size={13} /> },
-            { id: 'json', label: 'JSON Validator', icon: <Code2 size={13} /> }
+            { id: 'qr', label: 'QR Code', icon: <QrCode size={13} /> }
           ].map(tab => (
             <button
               key={tab.id}
@@ -631,12 +613,14 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
                         style={{
                           background: 'none',
                           border: 'none',
-                          color: 'var(--text-muted)',
+                          color: copiedVal === item.val ? 'var(--emerald)' : 'var(--text-muted)',
                           cursor: 'pointer',
-                          padding: '4px'
+                          padding: '4px',
+                          display: 'flex',
+                          alignItems: 'center'
                         }}
                       >
-                        <Copy size={13} />
+                        {copiedVal === item.val ? <Check size={13} /> : <Copy size={13} />}
                       </button>
                     )}
                   </div>
@@ -820,103 +804,6 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(qrText)}`}
                 alt="QR Code"
                 style={{ width: '140px', height: '140px' }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. JSON Validator Tab */}
-      {activeTab === 'json' && (
-        <div className="panel" style={{ padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-              Format, inspect, and test syntax offline
-            </span>
-            <button
-              onClick={handleFormatJson}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '5px 12px',
-                borderRadius: 'var(--radius-xs)',
-                backgroundColor: 'var(--emerald-subtle)',
-                color: 'var(--emerald)',
-                border: '1px solid rgba(16, 185, 129, 0.2)',
-                fontSize: '11.5px',
-                fontWeight: 600
-              }}
-            >
-              <Sparkles size={12} />
-              <span>Validate & Format</span>
-            </button>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>
-                Raw Input
-              </span>
-              <textarea
-                value={jsonInput}
-                onChange={(e) => setJsonInput(e.target.value)}
-                rows={11}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: 'var(--radius-xs)',
-                  backgroundColor: 'var(--bg-app)',
-                  border: '1px solid var(--border-hairline)',
-                  fontSize: '12px',
-                  fontFamily: 'JetBrains Mono',
-                  color: 'var(--text-primary)',
-                  resize: 'none'
-                }}
-              />
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  Formatted
-                </span>
-                {jsonOutput && (
-                  <button
-                    onClick={() => handleCopy(jsonOutput)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      color: 'var(--text-secondary)',
-                      fontSize: '10.5px',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {copied ? <Check size={11} /> : <Copy size={11} />}
-                    <span>{copied ? 'Copied' : 'Copy'}</span>
-                  </button>
-                )}
-              </div>
-
-              <textarea
-                value={jsonError || jsonOutput}
-                readOnly
-                rows={11}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: 'var(--radius-xs)',
-                  backgroundColor: 'var(--bg-app)',
-                  border: '1px solid',
-                  borderColor: jsonError ? 'var(--accent-clay)' : 'var(--border-hairline)',
-                  color: jsonError ? 'var(--accent-clay)' : 'var(--text-main)',
-                  fontSize: '12px',
-                  fontFamily: 'JetBrains Mono',
-                  resize: 'none'
-                }}
               />
             </div>
           </div>

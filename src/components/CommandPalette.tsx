@@ -104,7 +104,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     {
       id: 'nav-utilities',
       title: 'Student Toolbox',
-      subtitle: 'Calculators, QR studio, JSON formatters and utilities',
+      subtitle: 'Calculators, GPA planner, unit & base converters, and QR studio',
       icon: <Wrench size={16} color="var(--purple)" />,
       category: 'Navigation',
       action: () => { onSelectTab('utilities'); onClose(); }

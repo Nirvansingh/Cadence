@@ -45,7 +45,6 @@
   - **Unit & Base Converter**: Real-time conversions for Computer Science bases (Dec, Hex, Bin, Oct), Storage (KB, MB, GB, TB), and Temperature.
   - Offline Scientific Calculator (`sin`, `cos`, `tan`, `log`, `sqrt`).
   - Offline QR Code Studio.
-  - JSON Formatter, Validator & Dev Tools.
 
 - **📱 PWA & Desktop Installable**:
   - Installable via Chrome, Edge, Brave as a native standalone window.
