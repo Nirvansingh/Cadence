@@ -232,7 +232,6 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
               borderRadius: 'var(--radius-sm)',
               fontSize: '12.5px',
               fontWeight: 600,
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
               border: 'none',
               cursor: 'pointer'
             }}

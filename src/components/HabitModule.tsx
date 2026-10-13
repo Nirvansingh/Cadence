@@ -249,7 +249,6 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
               fontSize: '13px',
               fontWeight: 600,
               borderRadius: 'var(--radius-sm)',
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
               transition: 'var(--transition-fast)'
             }}
             onMouseEnter={(e) => {
@@ -784,7 +783,6 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                     color: '#090b10',
                     fontSize: '12.5px',
                     fontWeight: 600,
-                    boxShadow: '0 2px 10px rgba(16, 185, 129, 0.25)',
                     transition: 'var(--transition-fast)'
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#34d399'; }}

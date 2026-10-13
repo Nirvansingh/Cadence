@@ -344,7 +344,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   fontSize: '13px',
                   fontWeight: 600,
                   cursor: name.trim() ? 'pointer' : 'not-allowed',
-                  boxShadow: name.trim() ? '0 4px 14px rgba(16, 185, 129, 0.25)' : 'none',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
@@ -397,9 +396,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                         color: isSel ? '#090b10' : 'var(--text-secondary)',
                         border: '1px solid',
                         borderColor: isSel ? 'var(--amber)' : 'var(--border-hairline)',
-                        transform: isSel ? 'translateY(-2px)' : 'translateY(0)',
-                        boxShadow: isSel ? '0 4px 12px rgba(245, 158, 11, 0.25)' : 'none',
-                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                        transition: 'all 0.15s ease'
                       }} className="mono"
                     >
                       {time}
@@ -439,9 +436,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                         color: isSel ? '#090b10' : 'var(--text-secondary)',
                         border: '1px solid',
                         borderColor: isSel ? 'var(--sky)' : 'var(--border-hairline)',
-                        transform: isSel ? 'translateY(-2px)' : 'translateY(0)',
-                        boxShadow: isSel ? '0 4px 12px rgba(56, 189, 248, 0.25)' : 'none',
-                        transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                        transition: 'all 0.15s ease'
                       }} className="mono"
                     >
                       {time}
@@ -518,7 +513,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   color: '#090b10',
                   fontSize: '13px',
                   fontWeight: 600,
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
@@ -732,7 +726,6 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                   color: '#090b10',
                   fontSize: '13.5px',
                   fontWeight: 600,
-                  boxShadow: '0 4px 18px rgba(16, 185, 129, 0.35)',
                   transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >

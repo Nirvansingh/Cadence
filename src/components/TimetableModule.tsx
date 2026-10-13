@@ -342,7 +342,6 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
               color: '#090b10',
               fontSize: '12.5px',
               fontWeight: 600,
-              boxShadow: '0 4px 14px rgba(56, 189, 248, 0.25)',
               border: 'none',
               cursor: 'pointer'
             }}
@@ -789,7 +788,6 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                     color: '#090b10',
                     fontSize: '12.5px',
                     fontWeight: 600,
-                    boxShadow: '0 2px 10px rgba(56, 189, 248, 0.25)',
                     border: 'none',
                     cursor: 'pointer'
                   }}

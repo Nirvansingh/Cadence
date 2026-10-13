@@ -486,10 +486,10 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                boxShadow: `0 6px 20px ${isBreak ? 'rgba(16, 185, 129, 0.35)' : 'rgba(139, 92, 246, 0.35)'}`,
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.15s ease'
               }}
             >
               {isRunning ? <Pause size={18} /> : <Play size={18} fill="#ffffff" />}

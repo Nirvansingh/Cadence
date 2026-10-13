@@ -68,8 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             width: '10px',
             height: '10px',
             borderRadius: '3px',
-            backgroundColor: 'var(--emerald)',
-            boxShadow: '0 0 10px rgba(16, 185, 129, 0.35)'
+            backgroundColor: 'var(--emerald)'
           }} />
           <h1 style={{
             fontSize: '15px',

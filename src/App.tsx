@@ -32,9 +32,7 @@ export function App() {
   }, []);
 
   // App View Mode: 'landing' | 'onboarding' | 'workspace' | 'auth'
-  const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace' | 'auth'>(() => {
-    return storage.isOnboardingCompleted() ? 'workspace' : 'landing';
-  });
+  const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace' | 'auth'>('workspace');
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 

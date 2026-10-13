@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, 
-  ShieldCheck, 
   CheckCircle2, 
   Clock, 
-  Flame, 
-  Volume2, 
+  Calendar,
+  CheckSquare,
+  BookOpen,
+  Sliders,
   UploadCloud,
   Download
 } from 'lucide-react';
@@ -40,6 +41,40 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       installPrompt.userChoice.then(() => setInstallPrompt(null));
     }
   };
+
+  const modules = [
+    {
+      title: 'Daily Habits',
+      icon: <CheckCircle2 size={16} color="var(--amber)" />,
+      desc: 'Track recurring routines, multi-day streaks, and weekly consistency without pressure.'
+    },
+    {
+      title: 'Timetable & Schedule',
+      icon: <Calendar size={16} color="var(--sky)" />,
+      desc: 'Hour-by-hour class and study commitments. Export directly to Google or Apple Calendar (.ics).'
+    },
+    {
+      title: 'Study Timer',
+      icon: <Clock size={16} color="var(--violet)" />,
+      desc: 'Pomodoro focus sessions with offline synthesized rain and brown noise to block distractions.'
+    },
+    {
+      title: 'Task Board',
+      icon: <CheckSquare size={16} color="var(--emerald)" />,
+      desc: 'Organize assignments by deadline and urgency with subtasks and priority tags.'
+    },
+    {
+      title: 'Notebook',
+      icon: <BookOpen size={16} color="var(--rose)" />,
+      desc: 'Quick Markdown notes with math symbol inserts and tag filters for lecture notes.'
+    },
+    {
+      title: 'Student Tools',
+      icon: <Sliders size={16} color="var(--text-secondary)" />,
+      desc: 'Semester GPA calculator, base conversion (Hex/Bin/Dec), and quick unit converters.'
+    }
+  ];
+
   return (
     <div style={{
       width: '100vw',
@@ -48,33 +83,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       backgroundColor: 'var(--bg-app)',
       color: 'var(--text-main)',
       display: 'flex',
-      flexDirection: 'column',
-      position: 'relative'
+      flexDirection: 'column'
     }}>
-      
       {/* Top Header */}
       <header style={{
-        padding: '20px 48px',
+        padding: '16px 40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderBottom: '1px solid var(--border-hairline)',
-        backgroundColor: 'rgba(9, 11, 16, 0.85)',
-        backdropFilter: 'blur(16px)',
-        position: 'sticky',
-        top: 0,
-        zIndex: 50
+        backgroundColor: 'var(--bg-surface)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
-            width: '10px',
-            height: '10px',
-            borderRadius: '3px',
-            backgroundColor: 'var(--emerald)',
-            boxShadow: '0 0 12px rgba(16, 185, 129, 0.5)'
-          }} className="pulse-dot" />
+            width: '8px',
+            height: '8px',
+            borderRadius: '2px',
+            backgroundColor: 'var(--emerald)'
+          }} />
           <span style={{
-            fontSize: '15px',
+            fontSize: '14px',
             fontWeight: 700,
             letterSpacing: '0.04em',
             color: 'var(--text-pure)',
@@ -82,36 +110,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           }}>
             Cadence
           </span>
+          <span style={{ fontSize: '12px', color: 'var(--text-muted)', marginLeft: '6px' }}>
+            / Workspace Overview
+          </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {onOpenAuth && (
             <button
               onClick={onOpenAuth}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
                 fontSize: '12px',
-                fontWeight: 600,
-                color: 'var(--emerald)',
-                backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                padding: '7px 14px',
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+                padding: '6px 12px',
                 borderRadius: 'var(--radius-xs)',
-                border: '1px solid rgba(16, 185, 129, 0.25)',
-                transition: 'var(--transition-fast)',
+                border: '1px solid var(--border-hairline)',
                 cursor: 'pointer'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.16)';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(16, 185, 129, 0.08)';
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
             >
-              <span>Sign In / Cloud Sync</span>
+              Cloud Sync
             </button>
           )}
 
@@ -124,24 +142,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               fontSize: '12px',
               fontWeight: 500,
               color: 'var(--text-secondary)',
-              padding: '7px 14px',
+              padding: '6px 12px',
               borderRadius: 'var(--radius-xs)',
               border: '1px solid var(--border-hairline)',
-              transition: 'var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--text-pure)';
-              e.currentTarget.style.borderColor = 'var(--border-subtle)';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--text-secondary)';
-              e.currentTarget.style.borderColor = 'var(--border-hairline)';
-              e.currentTarget.style.transform = 'translateY(0)';
+              cursor: 'pointer'
             }}
           >
             <UploadCloud size={13} />
-            <span>Import Backup</span>
+            <span>Import Data</span>
           </button>
 
           {installPrompt && (
@@ -152,269 +160,158 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 alignItems: 'center',
                 gap: '6px',
                 fontSize: '12px',
-                fontWeight: 600,
-                color: 'var(--sky)',
-                backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                padding: '7px 14px',
+                fontWeight: 500,
+                color: 'var(--text-secondary)',
+                padding: '6px 12px',
                 borderRadius: 'var(--radius-xs)',
-                border: '1px solid rgba(56, 189, 248, 0.25)',
-                transition: 'var(--transition-fast)',
+                border: '1px solid var(--border-hairline)',
                 cursor: 'pointer'
               }}
             >
               <Download size={13} />
-              <span>Install App</span>
+              <span>Install Desktop PWA</span>
             </button>
           )}
 
           <button
-            onClick={onStartSetup}
+            onClick={onExploreDirectly}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              backgroundColor: 'var(--emerald)',
+              backgroundColor: 'var(--text-pure)',
               color: '#090b10',
-              padding: '8px 18px',
+              padding: '6px 14px',
               borderRadius: 'var(--radius-xs)',
-              fontSize: '12.5px',
+              fontSize: '12px',
               fontWeight: 600,
-              boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)',
-              transition: 'var(--transition-fast)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#34d399';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--emerald)';
-              e.currentTarget.style.transform = 'translateY(0)';
+              cursor: 'pointer'
             }}
           >
-            <span>Get Started</span>
-            <ArrowRight size={13} strokeWidth={2.5} />
+            <span>Open Workspace</span>
+            <ArrowRight size={13} />
           </button>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section style={{
-        maxWidth: '920px',
+      {/* Main Content */}
+      <main style={{
+        maxWidth: '860px',
         margin: '0 auto',
-        padding: '64px 24px 48px',
-        textAlign: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center'
-      }} className="animate-slide-up">
-        
-        {/* Simple Trust Pill */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '5px 14px',
-          borderRadius: 'var(--radius-pill)',
-          backgroundColor: 'var(--bg-subtle)',
-          border: '1px solid var(--border-subtle)',
-          marginBottom: '24px'
-        }}>
-          <ShieldCheck size={14} color="var(--emerald)" />
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-            100% Free & Offline • No sign-up required • Your data stays on your device
-          </span>
+        padding: '56px 24px 64px',
+        width: '100%'
+      }}>
+        {/* Intro */}
+        <div style={{ marginBottom: '48px' }}>
+          <h1 style={{
+            fontSize: '32px',
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: 'var(--text-pure)',
+            marginBottom: '12px'
+          }}>
+            Cadence Student Workspace
+          </h1>
+          <p style={{
+            fontSize: '15px',
+            color: 'var(--text-secondary)',
+            lineHeight: 1.6,
+            maxWidth: '620px'
+          }}>
+            A local-first productivity system designed for school and university. Runs completely offline in your browser or desktop with zero tracking.
+          </p>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <button
+              onClick={onExploreDirectly}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                backgroundColor: 'var(--text-pure)',
+                color: '#090b10',
+                padding: '9px 18px',
+                borderRadius: 'var(--radius-xs)',
+                fontSize: '13px',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              <span>Go to Workspace</span>
+              <ArrowRight size={14} />
+            </button>
+            <button
+              onClick={onStartSetup}
+              style={{
+                padding: '9px 16px',
+                borderRadius: 'var(--radius-xs)',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-hairline)',
+                color: 'var(--text-secondary)',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer'
+              }}
+            >
+              Run Setup Wizard
+            </button>
+          </div>
         </div>
 
-        {/* Headline */}
-        <h1 style={{
-          fontSize: '44px',
-          fontWeight: 700,
-          letterSpacing: '-0.03em',
-          lineHeight: 1.18,
-          color: 'var(--text-pure)',
-          maxWidth: '720px',
-          marginBottom: '16px'
-        }}>
-          A simple, calm workspace for students.
-        </h1>
-
-        {/* Subheading in Plain English */}
-        <p style={{
-          fontSize: '15.5px',
-          lineHeight: 1.6,
-          color: 'var(--text-secondary)',
-          maxWidth: '580px',
-          marginBottom: '32px'
-        }}>
-          Build daily habits, schedule your school and study time, and focus without distractions. Everything you need in one quiet place.
-        </p>
-
-        {/* CTA Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '56px' }}>
-          <button
-            onClick={onStartSetup}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              backgroundColor: 'var(--text-pure)',
-              color: '#090b10',
-              padding: '13px 26px',
-              borderRadius: 'var(--radius-sm)',
-              fontSize: '14px',
-              fontWeight: 600,
-              boxShadow: '0 4px 20px rgba(255, 255, 255, 0.15)',
-              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f1f5f9';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--text-pure)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <span>Start Quick Setup</span>
-            <ArrowRight size={15} strokeWidth={2.5} />
-          </button>
-
-          <button
-            onClick={onExploreDirectly}
-            style={{
-              padding: '13px 20px',
-              borderRadius: 'var(--radius-sm)',
-              backgroundColor: 'var(--bg-subtle)',
-              border: '1px solid var(--border-hairline)',
-              color: 'var(--text-secondary)',
-              fontSize: '13.5px',
-              fontWeight: 500,
-              transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = 'var(--text-pure)';
-              e.currentTarget.style.borderColor = 'var(--border-subtle)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'var(--text-secondary)';
-              e.currentTarget.style.borderColor = 'var(--border-hairline)';
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            <span>Open Clean Workspace</span>
-          </button>
-        </div>
-
-        {/* 3 Core Tools Grid with Interactive Hover Animation */}
+        {/* Modular Grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '18px',
-          width: '100%',
-          textAlign: 'left'
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '14px'
         }}>
-          {/* Card 1 */}
-          <div className="panel panel-interactive" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: 'var(--amber-subtle)',
-              border: '1px solid var(--amber-border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--amber)'
-            }}>
-              <Flame size={18} />
+          {modules.map(mod => (
+            <div
+              key={mod.title}
+              style={{
+                padding: '18px 20px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-hairline)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {mod.icon}
+                <h3 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-pure)' }}>
+                  {mod.title}
+                </h3>
+              </div>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                {mod.desc}
+              </p>
             </div>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-pure)' }}>
-              1. Habits That Stick
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Start with small 2-minute habits so you don't feel overwhelmed. Track your streak and celebrate daily progress without guilt.
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="panel panel-interactive" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: 'var(--sky-subtle)',
-              border: '1px solid var(--sky-border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--sky)'
-            }}>
-              <Clock size={18} />
-            </div>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-pure)' }}>
-              2. Your 24-Hour Day
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              See your classes, tuitions, and rest on a visual timeline. Instantly see how much free time you have and export to Google or Apple Calendar.
-            </p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="panel panel-interactive" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: 'var(--radius-xs)',
-              backgroundColor: 'var(--violet-subtle)',
-              border: '1px solid var(--violet-border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--violet)'
-            }}>
-              <Volume2 size={18} />
-            </div>
-            <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-pure)' }}>
-              3. Calm Study Timer
-            </h3>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-              Study in focused Pomodoro sessions with built-in rain and brown noise to block background sounds. Works 100% offline.
-            </p>
-          </div>
+          ))}
         </div>
 
-        {/* Bottom Simple Badges */}
+        {/* Architecture details */}
         <div style={{
-          marginTop: '44px',
-          padding: '20px 28px',
+          marginTop: '40px',
+          padding: '16px 20px',
           borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border-hairline)',
-          width: '100%',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-around'
+          justifyContent: 'space-between',
+          fontSize: '12px',
+          color: 'var(--text-muted)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CheckCircle2 size={15} color="var(--emerald)" />
-            <span style={{ fontSize: '12.5px', color: 'var(--text-main)', fontWeight: 500 }}>No ads or subscriptions</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CheckCircle2 size={15} color="var(--emerald)" />
-            <span style={{ fontSize: '12.5px', color: 'var(--text-main)', fontWeight: 500 }}>Saves on your computer</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CheckCircle2 size={15} color="var(--emerald)" />
-            <span style={{ fontSize: '12.5px', color: 'var(--text-main)', fontWeight: 500 }}>1-Click backup & export</span>
-          </div>
+          <span>Storage: Local-First (IndexedDB / LocalStorage)</span>
+          <span>Cloud: Supabase Auth & Multi-Device Sync (Optional)</span>
+          <span>Shortcut: <span className="mono">Ctrl + K</span> command palette</span>
         </div>
-      </section>
+      </main>
 
       {/* Footer */}
       <footer style={{
         marginTop: 'auto',
-        padding: '20px 48px',
+        padding: '16px 40px',
         borderTop: '1px solid var(--border-hairline)',
         display: 'flex',
         alignItems: 'center',
@@ -422,8 +319,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         fontSize: '11.5px',
         color: 'var(--text-muted)'
       }}>
-        <span>Cadence • Free and open source for students everywhere.</span>
-        <span>MIT License</span>
+        <span>Cadence • Open Source Student Workspace</span>
+        <span>Free Forever • MIT License</span>
       </footer>
     </div>
   );

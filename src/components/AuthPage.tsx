@@ -284,11 +284,10 @@ export const AuthPage: React.FC<AuthPageProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{
-                width: '12px',
-                height: '12px',
+                width: '10px',
+                height: '10px',
                 borderRadius: '3px',
-                backgroundColor: 'var(--emerald)',
-                boxShadow: '0 0 12px rgba(16, 185, 129, 0.5)'
+                backgroundColor: 'var(--emerald)'
               }} />
               <span style={{
                 fontSize: '15px',
@@ -529,7 +528,6 @@ export const AuthPage: React.FC<AuthPageProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                boxShadow: '0 4px 18px rgba(16, 185, 129, 0.3)',
                 transition: 'var(--transition-fast)'
               }}
             >
