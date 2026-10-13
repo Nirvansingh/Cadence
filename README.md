@@ -10,6 +10,10 @@
 
 ## ✨ Features
 
+- **⚡ Global Command Palette (`Ctrl + K` / `Cmd + K`)**:
+  - Instant keyboard-driven navigation across all modules.
+  - Quick action runner: toggle procedural sound, export database backups, or search features.
+
 - **🔥 The Habit Loop Engine**:
   - Daily checklist with 1-click spring-physics checkboxes.
   - Live SVG circular progress ring & streak flame counters.
@@ -31,13 +35,21 @@
   - 3-column workflow: To Do ➔ In Progress ➔ Completed.
   - Priority badges (Urgent, High, Medium, Low) and due date countdowns.
 
-- **📝 Notes & Formulas Scratchpad**:
+- **📝 Notes & STEM Formulas Scratchpad**:
   - Markdown note-taking with live preview and tag filtering.
+  - Quick-insert Math & Physics formula drawer (Quadratic, Newton's 2nd Law, Calculus integrals, etc.).
+  - 1-click scientific symbol inserter (`²`, `³`, `√`, `∑`, `∫`, `±`, `π`, `θ`, `Δ`, `∞`).
 
 - **🧰 Student & Developer Toolbox**:
+  - **GPA & Final Exam Target Calculator**: Real-time required final exam score computer with course weighting.
+  - **Unit & Base Converter**: Real-time conversions for Computer Science bases (Dec, Hex, Bin, Oct), Storage (KB, MB, GB, TB), and Temperature.
   - Offline Scientific Calculator (`sin`, `cos`, `tan`, `log`, `sqrt`).
   - Offline QR Code Studio.
   - JSON Formatter, Validator & Dev Tools.
+
+- **📱 PWA & Desktop Installable**:
+  - Installable via Chrome, Edge, Brave as a native standalone window.
+  - Offline caching via dedicated Service Worker.
 
 - **🔒 Local-First & 100% Private**:
   - Zero login required. All data stays on your machine.

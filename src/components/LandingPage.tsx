@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, 
   ShieldCheck, 
@@ -6,7 +6,8 @@ import {
   Clock, 
   Flame, 
   Volume2, 
-  UploadCloud
+  UploadCloud,
+  Download
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -20,6 +21,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onExploreDirectly,
   onImportBackup
 }) => {
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = () => {
+    if (installPrompt) {
+      installPrompt.prompt();
+      installPrompt.userChoice.then(() => setInstallPrompt(null));
+    }
+  };
   return (
     <div style={{
       width: '100vw',
@@ -93,6 +111,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <UploadCloud size={13} />
             <span>Import Backup</span>
           </button>
+
+          {installPrompt && (
+            <button
+              onClick={handleInstallClick}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--sky)',
+                backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                padding: '7px 14px',
+                borderRadius: 'var(--radius-xs)',
+                border: '1px solid rgba(56, 189, 248, 0.25)',
+                transition: 'var(--transition-fast)',
+                cursor: 'pointer'
+              }}
+            >
+              <Download size={13} />
+              <span>Install App</span>
+            </button>
+          )}
 
           <button
             onClick={onStartSetup}

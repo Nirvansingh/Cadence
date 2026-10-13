@@ -1,0 +1,19 @@
+{
+  "name": "Cadence — Daily Operating System",
+  "short_name": "Cadence",
+  "description": "Local-first, privacy-focused productivity suite designed for students and creators.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090b10",
+  "theme_color": "#0e1117",
+  "categories": ["education", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

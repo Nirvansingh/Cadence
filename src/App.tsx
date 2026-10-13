@@ -9,6 +9,7 @@ import { FocusModule } from './components/FocusModule';
 import { KanbanModule } from './components/KanbanModule';
 import { NotesModule } from './components/NotesModule';
 import { UtilityModule } from './components/UtilityModule';
+import { CommandPalette } from './components/CommandPalette';
 import { storage } from './storage/storageAdapter';
 import { Check } from 'lucide-react';
 
@@ -17,6 +18,7 @@ export function App() {
   const [profile, setProfile] = useState(() => storage.getProfile());
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => storage.getProfile().soundEnabled);
   const [backupNotice, setBackupNotice] = useState<string | null>(null);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   // App View Mode: 'landing' | 'onboarding' | 'workspace'
   const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace'>(() => {
@@ -24,6 +26,18 @@ export function App() {
   });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Global Keyboard Shortcut: Ctrl+K / Cmd+K
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     const updated = { ...profile, soundEnabled };
@@ -151,6 +165,7 @@ export function App() {
             onToggleSound={handleToggleSound}
             onExportBackup={handleExportBackup}
             onOpenLanding={() => setViewMode('landing')}
+            onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
           />
 
           <main key={currentTab} className="animate-pop" style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' }}>
@@ -163,6 +178,21 @@ export function App() {
           </main>
         </div>
       )}
+
+      {/* Global Command Palette (Ctrl + K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectTab={(tab) => {
+          setViewMode('workspace');
+          setCurrentTab(tab);
+        }}
+        onOpenLanding={() => setViewMode('landing')}
+        onOpenOnboarding={() => setViewMode('onboarding')}
+        soundEnabled={soundEnabled}
+        onToggleSound={handleToggleSound}
+        onExportBackup={handleExportBackup}
+      />
     </>
   );
 }

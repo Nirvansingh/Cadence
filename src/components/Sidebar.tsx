@@ -21,6 +21,7 @@ interface SidebarProps {
   onToggleSound: () => void;
   onExportBackup: () => void;
   onOpenLanding?: () => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -29,7 +30,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   soundEnabled,
   onToggleSound,
   onExportBackup,
-  onOpenLanding
+  onOpenLanding,
+  onOpenCommandPalette
 }) => {
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'habits', label: 'Daily Habits', icon: <CheckCircle2 size={15} strokeWidth={2} />, color: 'var(--amber)' },
@@ -52,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       flexShrink: 0
     }}>
       {/* Brand Header */}
-      <div style={{ padding: '0 8px 24px', borderBottom: '1px solid var(--border-hairline)' }}>
+      <div style={{ padding: '0 8px 18px', borderBottom: '1px solid var(--border-hairline)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{
             width: '10px',
@@ -74,6 +76,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', letterSpacing: '0.01em' }}>
           Daily Student Workspace
         </p>
+
+        {/* Command Palette Trigger */}
+        {onOpenCommandPalette && (
+          <button
+            onClick={onOpenCommandPalette}
+            style={{
+              marginTop: '12px',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '6px 10px',
+              borderRadius: 'var(--radius-xs)',
+              backgroundColor: 'var(--bg-app)',
+              border: '1px solid var(--border-hairline)',
+              color: 'var(--text-muted)',
+              fontSize: '11.5px',
+              cursor: 'pointer',
+              transition: 'var(--transition-fast)'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'var(--border-subtle)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'var(--border-hairline)';
+              e.currentTarget.style.color = 'var(--text-muted)';
+            }}
+          >
+            <span>Search & actions...</span>
+            <span className="mono" style={{
+              fontSize: '10px',
+              backgroundColor: 'var(--bg-card)',
+              padding: '1px 5px',
+              borderRadius: '3px',
+              border: '1px solid var(--border-hairline)'
+            }}>
+              Ctrl K
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Nav Items */}
