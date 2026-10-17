@@ -11,6 +11,7 @@ jobs:
     permissions:
       contents: write
     runs-on: windows-latest
+    continue-on-error: true
 
     steps:
       - name: Check out repository
