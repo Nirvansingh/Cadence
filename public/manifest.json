@@ -1,7 +1,7 @@
 {
-  "name": "Cadence — Daily Operating System",
+  "name": "Cadence — Student Daily Planner & Workspace",
   "short_name": "Cadence",
-  "description": "Local-first, privacy-focused productivity suite designed for students and creators.",
+  "description": "Fast, local-first daily planner for students. 100% offline with zero required login.",
   "start_url": "/",
   "display": "standalone",
   "orientation": "any",
