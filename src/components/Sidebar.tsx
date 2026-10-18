@@ -310,7 +310,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           >
             <Compass size={14} color="var(--text-muted)" />
-            <span>Welcome & Setup</span>
+            <span>Product Overview</span>
           </button>
         )}
       </div>

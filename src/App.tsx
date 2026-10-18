@@ -32,7 +32,14 @@ export function App() {
   }, []);
 
   // App View Mode: 'landing' | 'onboarding' | 'workspace' | 'auth'
-  const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace' | 'auth'>('workspace');
+  const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace' | 'auth'>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.location.hash === '#about' || window.location.search.includes('landing')) {
+        return 'landing';
+      }
+    }
+    return storage.isOnboardingCompleted() ? 'workspace' : 'landing';
+  });
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
