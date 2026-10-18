@@ -31,6 +31,14 @@
   flex-direction: column;
 }
 
+/* Accessible High-Contrast Focus Rings */
+.cadence-landing a:focus-visible,
+.cadence-landing button:focus-visible,
+.cadence-landing input:focus-visible {
+  outline: 2px solid var(--lp-sage);
+  outline-offset: 2px;
+}
+
 /* Header */
 .lp-header {
   position: sticky;
