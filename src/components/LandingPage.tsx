@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './LandingPage.css';
 import { 
   ArrowRight, 
@@ -48,6 +48,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onImportBackup,
   onOpenAuth
 }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Passive, GPU-composited background scroll animations
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+
+    let ticking = false;
+    const updateScrollMetrics = () => {
+      const top = el.scrollTop;
+      const max = el.scrollHeight - el.clientHeight;
+      const ratio = max > 0 ? top / max : 0;
+      el.style.setProperty('--scroll-y', `${top}px`);
+      el.style.setProperty('--scroll-ratio', ratio.toFixed(4));
+      ticking = false;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollMetrics);
+        ticking = true;
+      }
+    };
+
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    updateScrollMetrics();
+
+    return () => {
+      el.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const [installPrompt, setInstallPrompt] = useState<any>(null);
 
   // Interactive Habits Preview State (for Bento Grid)
@@ -176,7 +208,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   };
 
   return (
-    <div className="cadence-landing">
+    <div className="cadence-landing" ref={scrollContainerRef}>
+      {/* Dynamic Background Scroll Layer */}
+      <div className="lp-bg-scroll-layer" aria-hidden="true">
+        <div className="lp-bg-scroll-grid" />
+        <div className="lp-bg-scroll-orb lp-bg-orb-1" />
+        <div className="lp-bg-scroll-orb lp-bg-orb-2" />
+        <div className="lp-bg-scroll-orb lp-bg-orb-3" />
+        <div className="lp-bg-scroll-beam" />
+      </div>
+
       {/* Precision Header */}
       <header className="lp-header">
         <div className="lp-brand">
