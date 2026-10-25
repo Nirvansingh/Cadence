@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import type { FocusLog } from '../types';
 import { storage } from '../storage/storageAdapter';
 import { ambientEngine, playClickSound, playSuccessChime } from '../utils/sound';
+import { getLocalDateString } from '../utils/dateUtils';
 import { 
   Play, 
   Pause, 
@@ -55,7 +56,7 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
   const timerRef = useRef<number | null>(null);
   const stopwatchRef = useRef<number | null>(null);
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalDateString();
   const todayLogs = focusLogs.filter(l => l.dateStr === todayStr);
   const todayMinutes = todayLogs.reduce((acc, l) => acc + l.minutes, 0);
   const todaySessions = todayLogs.length;

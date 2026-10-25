@@ -28,6 +28,8 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
   const [tasks, setTasks] = useState<TaskItem[]>(() => storage.getTasks());
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [sortByUrgency, setSortByUrgency] = useState<boolean>(true);
+  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
+  const [dragOverCol, setDragOverCol] = useState<TaskStatus | null>(null);
 
   // New task form state
   const [newTitle, setNewTitle] = useState('');
@@ -250,13 +252,34 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
           return (
             <div
               key={col.id}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+              }}
+              onDragEnter={() => setDragOverCol(col.id)}
+              onDragLeave={(e) => {
+                if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+                  setDragOverCol(null);
+                }
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                const taskId = e.dataTransfer.getData('text/plain') || draggedTaskId;
+                if (taskId) {
+                  handleMoveStatus(taskId, col.id);
+                }
+                setDragOverCol(null);
+                setDraggedTaskId(null);
+              }}
               style={{
-                backgroundColor: 'var(--bg-surface)',
+                backgroundColor: dragOverCol === col.id ? 'rgba(56, 189, 248, 0.06)' : 'var(--bg-surface)',
                 borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-hairline)',
+                border: '1px solid',
+                borderColor: dragOverCol === col.id ? 'var(--sky)' : 'var(--border-hairline)',
                 display: 'flex',
                 flexDirection: 'column',
-                minHeight: '480px'
+                minHeight: '480px',
+                transition: 'all 0.15s ease'
               }}
             >
               {/* Column Header */}
@@ -294,7 +317,7 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
                     color: 'var(--text-muted)',
                     fontSize: '12px'
                   }}>
-                    No tasks here
+                    Drop tasks here
                   </div>
                 ) : (
                   colTasks.map(task => {
@@ -306,6 +329,15 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
                     return (
                       <div
                         key={task.id}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('text/plain', task.id);
+                          setDraggedTaskId(task.id);
+                        }}
+                        onDragEnd={() => {
+                          setDraggedTaskId(null);
+                          setDragOverCol(null);
+                        }}
                         className="panel-card"
                         style={{
                           padding: '14px 16px',
@@ -314,7 +346,10 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
                           gap: '8px',
                           backgroundColor: 'var(--bg-app)',
                           borderRadius: 'var(--radius-sm)',
-                          border: '1px solid var(--border-hairline)'
+                          border: '1px solid var(--border-hairline)',
+                          cursor: 'grab',
+                          opacity: draggedTaskId === task.id ? 0.4 : 1,
+                          transition: 'opacity 0.15s ease, transform 0.15s ease'
                         }}
                       >
                         {/* Top: Priority & Smart Due Date */}

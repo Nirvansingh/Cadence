@@ -1,4 +1,5 @@
 import type { Habit, HabitLog, TimetableSlot, NoteItem, TaskItem, UserProfile, CadenceBackupData, FocusLog } from '../types';
+import { getLocalDateString } from '../utils/dateUtils';
 
 const STORAGE_KEYS = {
   ONBOARDING_DONE: 'cadence_onboarded_v1',
@@ -12,6 +13,25 @@ const STORAGE_KEYS = {
 };
 
 class LocalStorageAdapter {
+  private changeListeners: (() => void)[] = [];
+
+  subscribe(listener: () => void): () => void {
+    this.changeListeners.push(listener);
+    return () => {
+      this.changeListeners = this.changeListeners.filter(l => l !== listener);
+    };
+  }
+
+  private notifyChange(): void {
+    this.changeListeners.forEach(listener => {
+      try {
+        listener();
+      } catch (err) {
+        console.error('Storage change listener error:', err);
+      }
+    });
+  }
+
   // Onboarding status
   isOnboardingCompleted(): boolean {
     return localStorage.getItem(STORAGE_KEYS.ONBOARDING_DONE) === 'true';
@@ -70,6 +90,7 @@ class LocalStorageAdapter {
 
   setHabits(habits: Habit[]): void {
     localStorage.setItem(STORAGE_KEYS.HABITS, JSON.stringify(habits));
+    this.notifyChange();
   }
 
   // Habit Logs
@@ -85,6 +106,7 @@ class LocalStorageAdapter {
 
   setHabitLogs(logs: HabitLog[]): void {
     localStorage.setItem(STORAGE_KEYS.HABIT_LOGS, JSON.stringify(logs));
+    this.notifyChange();
   }
 
   toggleHabitLog(habitId: string, dateStr: string): boolean {
@@ -121,6 +143,7 @@ class LocalStorageAdapter {
 
   setTimetable(slots: TimetableSlot[]): void {
     localStorage.setItem(STORAGE_KEYS.TIMETABLE, JSON.stringify(slots));
+    this.notifyChange();
   }
 
   // Tasks
@@ -136,6 +159,7 @@ class LocalStorageAdapter {
 
   setTasks(tasks: TaskItem[]): void {
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
+    this.notifyChange();
   }
 
   // Notes
@@ -151,6 +175,7 @@ class LocalStorageAdapter {
 
   setNotes(notes: NoteItem[]): void {
     localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
+    this.notifyChange();
   }
 
   // Focus Sessions
@@ -166,11 +191,12 @@ class LocalStorageAdapter {
 
   setFocusLogs(logs: FocusLog[]): void {
     localStorage.setItem(STORAGE_KEYS.FOCUS_LOGS, JSON.stringify(logs));
+    this.notifyChange();
   }
 
   addFocusLog(minutes: number): FocusLog {
     const logs = this.getFocusLogs();
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateString();
     const newLog: FocusLog = {
       id: `fl_${Date.now()}`,
       dateStr: today,

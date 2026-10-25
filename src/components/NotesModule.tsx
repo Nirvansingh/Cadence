@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { NoteItem } from '../types';
 import { storage } from '../storage/storageAdapter';
-import { playClickSound } from '../utils/sound';
+import { playClickSound, playSuccessChime } from '../utils/sound';
 import { 
   Plus, 
   Trash2, 
@@ -9,7 +9,10 @@ import {
   Search,
   Eye,
   Edit3,
-  Sigma
+  Sigma,
+  Download,
+  Copy,
+  Check
 } from 'lucide-react';
 
 interface NotesModuleProps {
@@ -27,14 +30,181 @@ const STEM_FORMULAS = [
 
 const MATH_SYMBOLS = ['²', '³', '√', '∑', '∫', '±', 'π', 'θ', 'Δ', 'λ', '∞', '≈', '≠', '≤', '≥'];
 
+// Lightweight Markdown & Math Parser
+const MarkdownPreview: React.FC<{ content: string }> = ({ content }) => {
+  if (!content.trim()) {
+    return <p style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Note is empty.</p>;
+  }
+
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let inCodeBlock = false;
+  let codeBuffer: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    // Code block
+    if (line.trim().startsWith('```')) {
+      if (inCodeBlock) {
+        elements.push(
+          <div key={`code_${i}`} style={{
+            margin: '12px 0',
+            padding: '14px',
+            backgroundColor: 'var(--bg-app)',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-subtle)',
+            overflowX: 'auto',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '12.5px',
+            color: 'var(--emerald)'
+          }}>
+            <pre style={{ margin: 0 }}>{codeBuffer.join('\n')}</pre>
+          </div>
+        );
+        codeBuffer = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBuffer.push(line);
+      continue;
+    }
+
+    // Mathematical formula block ($$formula$$)
+    if (line.trim().startsWith('$$') && line.trim().endsWith('$$') && line.trim().length > 4) {
+      const formula = line.trim().slice(2, -2);
+      elements.push(
+        <div key={`math_${i}`} style={{
+          margin: '12px 0',
+          padding: '12px 18px',
+          backgroundColor: 'rgba(56, 189, 248, 0.08)',
+          border: '1px solid var(--sky-border)',
+          borderRadius: 'var(--radius-sm)',
+          textAlign: 'center',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '14px',
+          color: 'var(--sky)'
+        }}>
+          {formula}
+        </div>
+      );
+      continue;
+    }
+
+    // Headings
+    if (line.startsWith('# ')) {
+      elements.push(<h1 key={i} style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-pure)', margin: '18px 0 8px' }}>{line.slice(2)}</h1>);
+      continue;
+    }
+    if (line.startsWith('## ')) {
+      elements.push(<h2 key={i} style={{ fontSize: '17px', fontWeight: 600, color: 'var(--text-pure)', margin: '14px 0 6px' }}>{line.slice(3)}</h2>);
+      continue;
+    }
+    if (line.startsWith('### ')) {
+      elements.push(<h3 key={i} style={{ fontSize: '14.5px', fontWeight: 600, color: 'var(--sky)', margin: '12px 0 4px' }}>{line.slice(4)}</h3>);
+      continue;
+    }
+
+    // Blockquote
+    if (line.startsWith('> ')) {
+      elements.push(
+        <blockquote key={i} style={{
+          margin: '10px 0',
+          paddingLeft: '14px',
+          borderLeft: '3px solid var(--amber)',
+          color: 'var(--text-secondary)',
+          fontStyle: 'italic'
+        }}>
+          {line.slice(2)}
+        </blockquote>
+      );
+      continue;
+    }
+
+    // Checkbox list
+    if (line.startsWith('- [ ] ')) {
+      elements.push(
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}>
+          <div style={{ width: '13px', height: '13px', borderRadius: '3px', border: '1px solid var(--border-subtle)' }} />
+          <span>{line.slice(6)}</span>
+        </div>
+      );
+      continue;
+    }
+    if (line.startsWith('- [x] ') || line.startsWith('- [X] ')) {
+      elements.push(
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0', textDecoration: 'line-through', color: 'var(--text-muted)' }}>
+          <div style={{ width: '13px', height: '13px', borderRadius: '3px', border: '1px solid var(--emerald)', backgroundColor: 'var(--emerald)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#090b10', fontSize: '9px' }}>✓</div>
+          <span>{line.slice(6)}</span>
+        </div>
+      );
+      continue;
+    }
+
+    // Bullet item
+    if (line.startsWith('- ') || line.startsWith('* ')) {
+      elements.push(
+        <div key={i} style={{ display: 'flex', gap: '8px', margin: '4px 0', paddingLeft: '8px' }}>
+          <span style={{ color: 'var(--sky)' }}>•</span>
+          <span>{line.slice(2)}</span>
+        </div>
+      );
+      continue;
+    }
+
+    // Empty line
+    if (!line.trim()) {
+      elements.push(<div key={i} style={{ height: '8px' }} />);
+      continue;
+    }
+
+    // Normal paragraph
+    elements.push(
+      <p key={i} style={{ margin: '4px 0', lineHeight: 1.6, color: 'var(--text-main)' }}>
+        {line}
+      </p>
+    );
+  }
+
+  return <div style={{ maxWidth: '780px' }}>{elements}</div>;
+};
+
 export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
   const [notes, setNotes] = useState<NoteItem[]>(() => storage.getNotes());
   const [activeNoteId, setActiveNoteId] = useState<string>(notes[0]?.id || '');
   const [searchQuery, setSearchQuery] = useState('');
   const [isPreview, setIsPreview] = useState(false);
   const [showFormulaBar, setShowFormulaBar] = useState(false);
+  const [copiedNotice, setCopiedNotice] = useState(false);
 
   const activeNote = notes.find(n => n.id === activeNoteId) || notes[0];
+
+  const handleExportNote = () => {
+    if (!activeNote) return;
+    const blob = new Blob([activeNote.content], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `${(activeNote.title || 'untitled').toLowerCase().replace(/\s+/g, '-')}.md`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    playSuccessChime(soundEnabled);
+  };
+
+  const handleCopyNote = () => {
+    if (!activeNote) return;
+    navigator.clipboard.writeText(activeNote.content);
+    setCopiedNotice(true);
+    playClickSound(soundEnabled);
+    setTimeout(() => setCopiedNotice(false), 2000);
+  };
 
   const handleUpdateContent = (content: string) => {
     if (!activeNote) return;
@@ -266,11 +436,12 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
                     gap: '5px',
                     padding: '5px 10px',
                     borderRadius: 'var(--radius-xs)',
-                    backgroundColor: 'var(--bg-subtle)',
-                    color: 'var(--text-secondary)',
+                    backgroundColor: isPreview ? 'var(--emerald-subtle)' : 'var(--bg-subtle)',
+                    color: isPreview ? 'var(--emerald)' : 'var(--text-secondary)',
+                    border: '1px solid',
+                    borderColor: isPreview ? 'var(--emerald-border)' : 'var(--border-hairline)',
                     fontSize: '12px',
-                    cursor: 'pointer',
-                    border: '1px solid var(--border-hairline)'
+                    cursor: 'pointer'
                   }}
                 >
                   {isPreview ? <Edit3 size={13} /> : <Eye size={13} />}
@@ -278,7 +449,48 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
                 </button>
 
                 <button
+                  onClick={handleCopyNote}
+                  title="Copy raw markdown to clipboard"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 10px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: copiedNotice ? 'var(--emerald-subtle)' : 'var(--bg-subtle)',
+                    color: copiedNotice ? 'var(--emerald)' : 'var(--text-secondary)',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    border: '1px solid var(--border-hairline)'
+                  }}
+                >
+                  {copiedNotice ? <Check size={13} /> : <Copy size={13} />}
+                  <span>{copiedNotice ? 'Copied!' : 'Copy'}</span>
+                </button>
+
+                <button
+                  onClick={handleExportNote}
+                  title="Download as .md file"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '5px 10px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: 'var(--bg-subtle)',
+                    color: 'var(--text-secondary)',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    border: '1px solid var(--border-hairline)'
+                  }}
+                >
+                  <Download size={13} />
+                  <span>.md</span>
+                </button>
+
+                <button
                   onClick={() => handleTogglePin(activeNote.id)}
+                  title={activeNote.isPinned ? 'Unpin note' : 'Pin note'}
                   style={{
                     padding: '6px',
                     borderRadius: 'var(--radius-xs)',
@@ -369,16 +581,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
             {/* Note Body */}
             <div style={{ flex: 1, padding: '24px 32px', overflowY: 'auto' }}>
               {isPreview ? (
-                <div style={{
-                  maxWidth: '760px',
-                  color: 'var(--text-main)',
-                  lineHeight: 1.7,
-                  fontSize: '14px',
-                  whiteSpace: 'pre-wrap',
-                  fontFamily: 'inherit'
-                }}>
-                  {activeNote.content}
-                </div>
+                <MarkdownPreview content={activeNote.content} />
               ) : (
                 <textarea
                   value={activeNote.content}

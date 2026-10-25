@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { Habit, HabitLog } from '../types';
 import { storage } from '../storage/storageAdapter';
 import { playClickSound, playSuccessChime } from '../utils/sound';
+import { getLocalDateString } from '../utils/dateUtils';
 import confetti from 'canvas-confetti';
 import { 
   Plus, 
@@ -37,7 +38,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   const [newRoutine, setNewRoutine] = useState('');
   const [newReward, setNewReward] = useState('');
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = getLocalDateString();
 
   const isHabitCompleted = (habitId: string, dateStr: string) => {
     return logs.some(l => l.habitId === habitId && l.completedDate === dateStr);
@@ -68,7 +69,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   const calculateStreak = (habit: Habit): number => {
     let streak = 0;
     const checkDate = new Date();
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 90; i++) {
       const dayOfWeek = checkDate.getDay();
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
@@ -77,7 +78,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
         continue;
       }
 
-      const dateStr = checkDate.toISOString().split('T')[0];
+      const dateStr = getLocalDateString(checkDate);
       const hasLog = logs.some(l => l.habitId === habit.id && l.completedDate === dateStr);
       if (hasLog) {
         streak++;
@@ -95,7 +96,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const str = d.toISOString().split('T')[0];
+      const str = getLocalDateString(d);
       days.push({ dateStr: str, label: labels[d.getDay()] });
     }
     return days;

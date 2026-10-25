@@ -7,9 +7,11 @@ export type SyncStatus = 'offline' | 'syncing' | 'synced' | 'error';
 class CloudSyncService {
   private syncStatus: SyncStatus = 'offline';
   private listeners: ((status: SyncStatus) => void)[] = [];
+  private debounceTimer: any = null;
 
   constructor() {
     this.init();
+    this.setupAutoSync();
   }
 
   private async init() {
@@ -19,6 +21,26 @@ class CloudSyncService {
     } else {
       this.setStatus('offline');
     }
+  }
+
+  private setupAutoSync() {
+    storage.subscribe(() => {
+      // Auto-push with 2s debounce if logged in
+      if (this.syncStatus === 'synced') {
+        if (this.debounceTimer) clearTimeout(this.debounceTimer);
+        this.debounceTimer = setTimeout(() => {
+          this.pushLocalToCloud();
+        }, 2000);
+      }
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        this.setStatus('synced');
+      } else {
+        this.setStatus('offline');
+      }
+    });
   }
 
   getStatus(): SyncStatus {

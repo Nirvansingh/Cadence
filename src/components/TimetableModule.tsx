@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { TimetableSlot, DayOfWeek, TimetableCategory } from '../types';
 import { storage } from '../storage/storageAdapter';
 import { downloadICalendarFile } from '../utils/icsExport';
 import { playClickSound, playSuccessChime } from '../utils/sound';
+import { getLocalDayOfWeek, isCurrentSlot } from '../utils/dateUtils';
 import { 
   Plus, 
   ArrowDownToLine, 
@@ -10,7 +11,8 @@ import {
   Trash2, 
   Check, 
   AlertTriangle,
-  Layers
+  Layers,
+  Radio
 } from 'lucide-react';
 
 interface TimetableModuleProps {
@@ -32,11 +34,17 @@ const CATEGORY_PALETTE: Record<TimetableCategory, { hex: string; label: string; 
 
 export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }) => {
   const [slots, setSlots] = useState<TimetableSlot[]>(() => storage.getTimetable());
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Monday');
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>(() => getLocalDayOfWeek());
+  const [now, setNow] = useState<Date>(() => new Date());
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showCopyModal, setShowCopyModal] = useState<boolean>(false);
   const [exportNotice, setExportNotice] = useState<boolean>(false);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState<TimetableCategory>('study');
@@ -65,6 +73,28 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
 
   const freeMinutes = Math.max(0, 24 * 60 - totalCommittedMinutes);
   const freeHours = (freeMinutes / 60).toFixed(1);
+
+  const todayDayOfWeek = getLocalDayOfWeek(now);
+  const isLookingAtToday = selectedDay === todayDayOfWeek;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+  // Find active slot happening right now
+  const activeCurrentSlot = isLookingAtToday
+    ? daySlots.find(s => isCurrentSlot(selectedDay, s.startTime, s.endTime, now))
+    : undefined;
+
+  const activeMinutesRemaining = activeCurrentSlot
+    ? Math.max(0, toMinutes(activeCurrentSlot.endTime) - currentMinutes)
+    : 0;
+
+  // Find next upcoming slot today
+  const nextUpcomingSlot = isLookingAtToday
+    ? daySlots.find(s => toMinutes(s.startTime) > currentMinutes)
+    : undefined;
+
+  const minutesUntilNext = nextUpcomingSlot
+    ? toMinutes(nextUpcomingSlot.startTime) - currentMinutes
+    : 0;
 
   // Logic: Live Conflict / Overlap Detection
   const conflictingSlot = daySlots.find(s => {
@@ -424,6 +454,58 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
         })}
       </div>
 
+      {/* Live Schedule Status Banner (Today) */}
+      {isLookingAtToday && (
+        <div style={{
+          padding: '12px 18px',
+          borderRadius: 'var(--radius-sm)',
+          backgroundColor: activeCurrentSlot ? 'rgba(56, 189, 248, 0.08)' : 'var(--bg-surface)',
+          border: `1px solid ${activeCurrentSlot ? 'var(--sky-border)' : 'var(--border-hairline)'}`,
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: activeCurrentSlot ? '#38bdf8' : 'var(--emerald)',
+              boxShadow: activeCurrentSlot ? '0 0 8px rgba(56, 189, 248, 0.8)' : '0 0 8px rgba(16, 185, 129, 0.6)'
+            }} />
+            <div>
+              {activeCurrentSlot ? (
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-pure)' }}>
+                  HAPPENING NOW: <span style={{ color: CATEGORY_PALETTE[activeCurrentSlot.category].hex }}>{activeCurrentSlot.title}</span>
+                  <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: '8px', fontSize: '12px' }}>
+                    ({activeCurrentSlot.startTime} – {activeCurrentSlot.endTime} • {activeMinutesRemaining}m remaining)
+                  </span>
+                </div>
+              ) : nextUpcomingSlot ? (
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-pure)' }}>
+                  CURRENTLY FREE • <span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>Next event:</span> <span style={{ color: CATEGORY_PALETTE[nextUpcomingSlot.category].hex }}>{nextUpcomingSlot.title}</span>
+                  <span style={{ fontWeight: 400, color: 'var(--text-muted)', marginLeft: '8px', fontSize: '12px' }}>
+                    at {nextUpcomingSlot.startTime} (in {minutesUntilNext}m)
+                  </span>
+                </div>
+              ) : (
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  SCHEDULE CLEAR: All routines completed for today.
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mono" style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Radio size={12} color="#38bdf8" />
+            <span>LIVE TICKER • {String(now.getHours()).padStart(2, '0')}:{String(now.getMinutes()).padStart(2, '0')}</span>
+          </div>
+        </div>
+      )}
+
       {/* 24h Timeline Visual Bar */}
       <div style={{
         backgroundColor: 'var(--bg-surface)',
@@ -441,31 +523,62 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
           </span>
         </div>
 
-        <div style={{
-          height: '14px',
-          borderRadius: '7px',
-          backgroundColor: 'var(--bg-card)',
-          overflow: 'hidden',
-          display: 'flex',
-          border: '1px solid var(--border-hairline)'
-        }}>
-          {daySlots.map(slot => {
-            let dur = toMinutes(slot.endTime) - toMinutes(slot.startTime);
-            if (dur < 0) dur += 24 * 60;
-            const pct = (dur / (24 * 60)) * 100;
-            return (
-              <div
-                key={slot.id}
-                title={`${slot.title} (${slot.startTime} - ${slot.endTime})`}
-                style={{
-                  width: `${pct}%`,
-                  height: '100%',
-                  backgroundColor: CATEGORY_PALETTE[slot.category].hex,
-                  transition: 'width 0.3s ease'
-                }}
-              />
-            );
-          })}
+        <div style={{ position: 'relative' }}>
+          <div style={{
+            height: '14px',
+            borderRadius: '7px',
+            backgroundColor: 'var(--bg-card)',
+            overflow: 'hidden',
+            display: 'flex',
+            border: '1px solid var(--border-hairline)'
+          }}>
+            {daySlots.map(slot => {
+              let dur = toMinutes(slot.endTime) - toMinutes(slot.startTime);
+              if (dur < 0) dur += 24 * 60;
+              const pct = (dur / (24 * 60)) * 100;
+              return (
+                <div
+                  key={slot.id}
+                  title={`${slot.title} (${slot.startTime} - ${slot.endTime})`}
+                  style={{
+                    width: `${pct}%`,
+                    height: '100%',
+                    backgroundColor: CATEGORY_PALETTE[slot.category].hex,
+                    transition: 'width 0.3s ease'
+                  }}
+                />
+              );
+            })}
+          </div>
+
+          {/* Real-time Time Marker Cursor */}
+          {isLookingAtToday && (
+            <div
+              title={`Now: ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`}
+              style={{
+                position: 'absolute',
+                top: '-3px',
+                bottom: '-3px',
+                left: `${(currentMinutes / 1440) * 100}%`,
+                width: '2px',
+                backgroundColor: '#ffffff',
+                boxShadow: '0 0 6px #38bdf8',
+                zIndex: 5,
+                pointerEvents: 'none'
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                top: '-3px',
+                left: '-3px',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#ffffff',
+                border: '1px solid #38bdf8'
+              }} />
+            </div>
+          )}
         </div>
 
         {/* Legend */}
