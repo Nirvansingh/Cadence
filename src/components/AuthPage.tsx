@@ -1,17 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../storage/supabaseClient';
 import { cloudSync } from '../storage/cloudSyncService';
-import { 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ArrowRight, 
-  ArrowLeft, 
-  CheckCircle2, 
-  AlertCircle, 
-  ShieldCheck, 
-  RefreshCw
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle2,
+  AlertCircle,
+  ShieldCheck,
+  RefreshCw,
+  KeyRound
 } from 'lucide-react';
 
 interface AuthPageProps {
@@ -23,6 +24,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({
   onBackToWorkspace,
   onSuccess
 }) => {
+  const [authMethod, setAuthMethod] = useState<'otp' | 'password'>('otp');
+  const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
+  const [otpToken, setOtpToken] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
+
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -215,7 +221,77 @@ export const AuthPage: React.FC<AuthPageProps> = ({
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Resend OTP countdown timer
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const interval = setInterval(() => {
+      setResendTimer(prev => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!email.trim() || !email.includes('@')) {
+      setErrorMsg('Please enter a valid email address.');
+      return;
+    }
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: true
+        }
+      });
+      if (error) throw error;
+      setOtpStep('verify');
+      setResendTimer(60);
+      setSuccessMsg(`We sent a 6-digit one-time code to ${email.trim()}`);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to send verification code. Please check your email.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = otpToken.trim();
+    if (!token || token.length < 6) {
+      setErrorMsg('Please enter the complete 6-digit code from your email.');
+      return;
+    }
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token,
+        type: 'email'
+      });
+      if (error) throw error;
+      if (data.session) {
+        setSuccessMsg('Code verified! Downloading your cloud workspace...');
+        await cloudSync.pullCloudToLocal();
+        setTimeout(() => onSuccess(), 1000);
+      } else {
+        setSuccessMsg('Verified! Opening workspace...');
+        setTimeout(() => onSuccess(), 1000);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Invalid or expired verification code.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
@@ -336,7 +412,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             letterSpacing: '-0.02em',
             lineHeight: 1.2
           }}>
-            {mode === 'signin' ? 'Welcome back' : 'Create your account'}
+            {authMethod === 'otp'
+              ? (otpStep === 'verify' ? 'Enter 6-digit code' : 'One-Time Code Login')
+              : (mode === 'signin' ? 'Welcome back' : 'Create your account')}
           </h1>
           <p style={{
             fontSize: '13px',
@@ -344,57 +422,116 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             marginTop: '8px',
             lineHeight: 1.5
           }}>
-            {mode === 'signin'
-              ? 'Sign in to sync your schedule, habits, and notes across all your devices.'
-              : 'Join with free cloud sync. Zero telemetry, local-first by default.'}
+            {authMethod === 'otp'
+              ? (otpStep === 'verify'
+                ? `Enter the verification code sent to ${email}`
+                : 'Instant passwordless access. We will email you a 6-digit login code.')
+              : (mode === 'signin'
+                ? 'Sign in with your password to sync your schedule and habits.'
+                : 'Join with free cloud sync. Zero telemetry, local-first by default.')}
           </p>
 
-          {/* Mode Switch Tabs */}
+          {/* Primary Method Switch Tabs: OTP vs Password */}
           <div style={{
             display: 'flex',
-            marginTop: '24px',
+            marginTop: '20px',
             backgroundColor: 'rgba(255, 255, 255, 0.03)',
             borderRadius: 'var(--radius-xs)',
-            padding: '4px',
+            padding: '3px',
             border: '1px solid var(--border-hairline)'
           }}>
             <button
               type="button"
-              onClick={() => { setMode('signin'); setErrorMsg(null); setSuccessMsg(null); }}
+              onClick={() => { setAuthMethod('otp'); setErrorMsg(null); setSuccessMsg(null); }}
               style={{
                 flex: 1,
-                padding: '8px',
+                padding: '7px',
                 borderRadius: 'var(--radius-xs)',
                 border: 'none',
-                backgroundColor: mode === 'signin' ? 'var(--bg-card)' : 'transparent',
-                color: mode === 'signin' ? 'var(--text-pure)' : 'var(--text-muted)',
-                fontSize: '12.5px',
+                backgroundColor: authMethod === 'otp' ? 'var(--bg-card)' : 'transparent',
+                color: authMethod === 'otp' ? 'var(--text-pure)' : 'var(--text-muted)',
+                fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
                 transition: 'var(--transition-fast)'
               }}
             >
-              Sign In
+              <Mail size={13} />
+              <span>Email Code (OTP)</span>
             </button>
             <button
               type="button"
-              onClick={() => { setMode('signup'); setErrorMsg(null); setSuccessMsg(null); }}
+              onClick={() => { setAuthMethod('password'); setErrorMsg(null); setSuccessMsg(null); }}
               style={{
                 flex: 1,
-                padding: '8px',
+                padding: '7px',
                 borderRadius: 'var(--radius-xs)',
                 border: 'none',
-                backgroundColor: mode === 'signup' ? 'var(--bg-card)' : 'transparent',
-                color: mode === 'signup' ? 'var(--text-pure)' : 'var(--text-muted)',
-                fontSize: '12.5px',
+                backgroundColor: authMethod === 'password' ? 'var(--bg-card)' : 'transparent',
+                color: authMethod === 'password' ? 'var(--text-pure)' : 'var(--text-muted)',
+                fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
                 transition: 'var(--transition-fast)'
               }}
             >
-              Create Account
+              <Lock size={13} />
+              <span>Password</span>
             </button>
           </div>
+
+          {/* If Password mode is chosen: signin vs signup tabs */}
+          {authMethod === 'password' && (
+            <div style={{
+              display: 'flex',
+              marginTop: '10px',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              borderRadius: 'var(--radius-xs)',
+              padding: '2px',
+              border: '1px solid var(--border-hairline)'
+            }}>
+              <button
+                type="button"
+                onClick={() => { setMode('signin'); setErrorMsg(null); setSuccessMsg(null); }}
+                style={{
+                  flex: 1,
+                  padding: '6px',
+                  borderRadius: 'var(--radius-xs)',
+                  border: 'none',
+                  backgroundColor: mode === 'signin' ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                  color: mode === 'signin' ? 'var(--text-pure)' : 'var(--text-muted)',
+                  fontSize: '11.5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setErrorMsg(null); setSuccessMsg(null); }}
+                style={{
+                  flex: 1,
+                  padding: '6px',
+                  borderRadius: 'var(--radius-xs)',
+                  border: 'none',
+                  backgroundColor: mode === 'signup' ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+                  color: mode === 'signup' ? 'var(--text-pure)' : 'var(--text-muted)',
+                  fontSize: '11.5px',
+                  cursor: 'pointer'
+                }}
+              >
+                Create Account
+              </button>
+            </div>
+          )}
 
           {/* Alerts */}
           {errorMsg && (
@@ -433,108 +570,278 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             </div>
           )}
 
-          {/* Main Auth Form */}
-          <form onSubmit={handleSubmit} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                Email Address
-              </label>
-              <div style={{ position: 'relative' }}>
-                <Mail size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="student@university.edu"
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px 10px 38px',
-                    borderRadius: 'var(--radius-xs)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-pure)',
-                    fontSize: '13px',
-                    outline: 'none',
-                    transition: 'var(--transition-fast)'
-                  }}
-                  onFocus={e => e.currentTarget.style.borderColor = 'var(--emerald)'}
-                  onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
-                />
-              </div>
-            </div>
+          {/* ============ OTP METHOD FORMS ============ */}
+          {authMethod === 'otp' && (
+            otpStep === 'request' ? (
+              /* Step 1: Request OTP Code */
+              <form onSubmit={handleSendOtp} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                    Email Address
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <Mail size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+                    <input
+                      type="email"
+                      required
+                      autoFocus
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder="student@university.edu"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px 10px 38px',
+                        borderRadius: 'var(--radius-xs)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-pure)',
+                        fontSize: '13px',
+                        outline: 'none',
+                        transition: 'var(--transition-fast)'
+                      }}
+                      onFocus={e => e.currentTarget.style.borderColor = 'var(--emerald)'}
+                      onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+                    />
+                  </div>
+                </div>
 
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                Password
-              </label>
-              <div style={{ position: 'relative' }}>
-                <Lock size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  style={{
-                    width: '100%',
-                    padding: '10px 38px 10px 38px',
-                    borderRadius: 'var(--radius-xs)',
-                    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid var(--border-subtle)',
-                    color: 'var(--text-pure)',
-                    fontSize: '13px',
-                    outline: 'none',
-                    transition: 'var(--transition-fast)'
-                  }}
-                  onFocus={e => e.currentTarget.style.borderColor = 'var(--emerald)'}
-                  onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
-                />
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  type="submit"
+                  disabled={loading}
                   style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '10px',
-                    background: 'none',
+                    marginTop: '6px',
+                    padding: '12px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: 'var(--emerald)',
                     border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                    display: 'flex'
+                    color: '#05070e',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    cursor: loading ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'var(--transition-fast)'
                   }}
                 >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {loading ? <RefreshCw size={15} className="animate-spin" /> : <ArrowRight size={15} />}
+                  <span>Send Login Code</span>
                 </button>
-              </div>
-            </div>
+              </form>
+            ) : (
+              /* Step 2: Enter 6-digit Code */
+              <form onSubmit={handleVerifyOtp} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)' }}>
+                      6-Digit Code
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => { setOtpStep('request'); setOtpToken(''); setErrorMsg(null); }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Change email
+                    </button>
+                  </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                marginTop: '10px',
-                padding: '12px',
-                borderRadius: 'var(--radius-xs)',
-                backgroundColor: 'var(--emerald)',
-                border: 'none',
-                color: '#05070e',
-                fontSize: '13px',
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                transition: 'var(--transition-fast)'
-              }}
-            >
-              {loading ? <RefreshCw size={15} className="animate-spin" /> : <ArrowRight size={15} />}
-              <span>{mode === 'signin' ? 'Sign In & Sync' : 'Create Free Account'}</span>
-            </button>
-          </form>
+                  <div style={{ position: 'relative' }}>
+                    <KeyRound size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      required
+                      autoFocus
+                      value={otpToken}
+                      onChange={e => setOtpToken(e.target.value.replace(/\D/g, ''))}
+                      placeholder="123456"
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px 10px 38px',
+                        borderRadius: 'var(--radius-xs)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-pure)',
+                        fontSize: '18px',
+                        letterSpacing: '0.3em',
+                        fontFamily: 'monospace',
+                        outline: 'none',
+                        transition: 'var(--transition-fast)'
+                      }}
+                      onFocus={e => e.currentTarget.style.borderColor = 'var(--emerald)'}
+                      onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || otpToken.length < 6}
+                  style={{
+                    padding: '12px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: 'var(--emerald)',
+                    border: 'none',
+                    color: '#05070e',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                    cursor: (loading || otpToken.length < 6) ? 'not-allowed' : 'pointer',
+                    opacity: otpToken.length < 6 ? 0.6 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    transition: 'var(--transition-fast)'
+                  }}
+                >
+                  {loading ? <RefreshCw size={15} className="animate-spin" /> : <CheckCircle2 size={15} />}
+                  <span>Verify Code & Sign In</span>
+                </button>
+
+                <div style={{ textAlign: 'center', marginTop: '4px' }}>
+                  {resendTimer > 0 ? (
+                    <span style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                      Resend new code in {resendTimer}s
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleSendOtp()}
+                      disabled={loading}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--emerald)',
+                        fontSize: '12px',
+                        fontWeight: 500,
+                        cursor: 'pointer',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      Resend 6-digit code
+                    </button>
+                  )}
+                </div>
+              </form>
+            )
+          )}
+
+          {/* ============ PASSWORD METHOD FORM ============ */}
+          {authMethod === 'password' && (
+            <form onSubmit={handlePasswordSubmit} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Email Address
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="student@university.edu"
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px 10px 38px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-pure)',
+                      fontSize: '13px',
+                      outline: 'none',
+                      transition: 'var(--transition-fast)'
+                    }}
+                    onFocus={e => e.currentTarget.style.borderColor = 'var(--emerald)'}
+                    onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                  Password
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={15} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    style={{
+                      width: '100%',
+                      padding: '10px 38px 10px 38px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--border-subtle)',
+                      color: 'var(--text-pure)',
+                      fontSize: '13px',
+                      outline: 'none',
+                      transition: 'var(--transition-fast)'
+                    }}
+                    onFocus={e => e.currentTarget.style.borderColor = 'var(--emerald)'}
+                    onBlur={e => e.currentTarget.style.borderColor = 'var(--border-subtle)'}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '10px',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      display: 'flex'
+                    }}
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  marginTop: '10px',
+                  padding: '12px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: 'var(--emerald)',
+                  border: 'none',
+                  color: '#05070e',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  letterSpacing: '0.02em',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  transition: 'var(--transition-fast)'
+                }}
+              >
+                {loading ? <RefreshCw size={15} className="animate-spin" /> : <ArrowRight size={15} />}
+                <span>{mode === 'signin' ? 'Sign In & Sync' : 'Create Free Account'}</span>
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Footer info & Offline skip */}
@@ -594,6 +901,81 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             display: 'block'
           }}
         />
+
+        {/* Institutional Production Editorial Overlay */}
+        <div style={{
+          position: 'relative',
+          zIndex: 10,
+          maxWidth: '540px',
+          padding: '48px',
+          backgroundColor: 'rgba(8, 12, 20, 0.72)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRadius: '8px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+          boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6)'
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            alignSelf: 'flex-start',
+            padding: '4px 12px',
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            color: '#94a3b8',
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            letterSpacing: '0.04em'
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--emerald)', display: 'inline-block' }} />
+            <span>CADENCE CLOUD SYNC • US-EAST ACTIVE</span>
+          </div>
+
+          <h2 style={{ fontSize: '26px', fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.02em', lineHeight: 1.3, margin: 0 }}>
+            Your entire study workspace. Synchronized securely across all your devices.
+          </h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '13px', color: '#94a3b8' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <CheckCircle2 size={16} strokeWidth={1.5} color="var(--emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span><strong>End-to-End Encrypted:</strong> Secured in PostgreSQL with Row-Level Security. Only your authenticated credentials can read or decrypt your data.</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <CheckCircle2 size={16} strokeWidth={1.5} color="var(--emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span><strong>Offline-First Resilience:</strong> Continue studying even without Wi-Fi in lecture halls. Local changes seamlessly sync the instant you reconnect.</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <CheckCircle2 size={16} strokeWidth={1.5} color="var(--emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span><strong>Passwordless OTP Verification:</strong> Instant 6-digit one-time code sent directly to your email. No passwords to leak or memorize.</span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <CheckCircle2 size={16} strokeWidth={1.5} color="var(--emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <span><strong>Cross-Platform Parity:</strong> Seamless continuity between the native Windows app (.exe), web browser, and offline PWA.</span>
+            </div>
+          </div>
+
+          <div style={{
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            paddingTop: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            color: '#64748b'
+          }}>
+            <span>TLS 1.3 • AES-GCM • POSTGRES 15</span>
+            <span style={{ color: 'var(--emerald)' }}>4,200+ ACTIVE LEARNERS</span>
+          </div>
+        </div>
       </div>
     </div>
   );
