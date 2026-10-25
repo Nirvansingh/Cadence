@@ -14,10 +14,8 @@ import {
   Pause, 
   Volume2, 
   VolumeX, 
-  ExternalLink,
-  Users
+  ExternalLink
 } from 'lucide-react';
-import { supabase } from '../storage/supabaseClient';
 import { playClickSound, playSuccessChime, ambientEngine } from '../utils/sound';
 
 const GithubIcon: React.FC<{ size?: number }> = ({ size = 14 }) => (
@@ -72,9 +70,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(25 * 60);
 
-  // Live Community User Count from Supabase
-  const [userCount, setUserCount] = useState<number | null>(null);
-
   // Custom Drag-and-Drop Backup State
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -104,22 +99,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     };
     reader.readAsText(file);
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    async function loadUserCount() {
-      try {
-        const { data, error } = await supabase.rpc('get_user_count');
-        if (!error && typeof data === 'number' && isMounted) {
-          setUserCount(data);
-        }
-      } catch {
-        // Fallback silently if RPC is not deployed yet
-      }
-    }
-    loadUserCount();
-    return () => { isMounted = false; };
-  }, []);
 
 
   useEffect(() => {
@@ -208,44 +187,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         <nav className="lp-header-actions">
           <a 
+            href="https://github.com/Nirvansingh/Cadence/releases" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="lp-nav-link"
+            title="Download Cadence Desktop for Windows (.exe)"
+          >
+            <span>Desktop (.exe)</span>
+          </a>
+
+          <button 
+            onClick={() => setIsImportModalOpen(true)} 
+            className="lp-nav-link" 
+            title="Import offline JSON database backup"
+          >
+            <UploadCloud size={13} strokeWidth={1.5} />
+            <span>Import Backup</span>
+          </button>
+
+          {onOpenAuth && (
+            <button onClick={onOpenAuth} className="lp-nav-link">
+              <span>Cloud Sync</span>
+            </button>
+          )}
+
+          {installPrompt && (
+            <button onClick={handleInstallClick} className="lp-nav-link">
+              <Download size={13} />
+              <span>Install PWA</span>
+            </button>
+          )}
+
+          <a 
             href="https://github.com/Nirvansingh/Cadence" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="lp-btn-ghost"
+            className="lp-nav-link"
             title="View Cadence on GitHub"
           >
             <GithubIcon size={13} />
             <span>GitHub</span>
           </a>
-
-          {onOpenAuth && (
-            <button onClick={onOpenAuth} className="lp-btn-ghost">
-              <span>Cloud Sync</span>
-            </button>
-          )}
-
-          <a 
-            href="https://github.com/Nirvansingh/Cadence/releases" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="lp-btn-ghost"
-            title="Download Cadence Desktop for Windows (.exe)"
-          >
-            <Download size={13} />
-            <span>Download App (.exe)</span>
-          </a>
-
-          <button onClick={() => setIsImportModalOpen(true)} className="lp-btn-ghost" title="Import offline JSON database backup">
-            <UploadCloud size={13} strokeWidth={1.5} />
-            <span>Import Data</span>
-          </button>
-
-          {installPrompt && (
-            <button onClick={handleInstallClick} className="lp-btn-ghost">
-              <Download size={13} />
-              <span>Install PWA</span>
-            </button>
-          )}
 
           <button onClick={onExploreDirectly} className="lp-btn-primary">
             <span>Launch Web App</span>
@@ -256,11 +238,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
       {/* Hero Section */}
       <section className="lp-hero-section">
-        <div className="lp-kicker">
-          <span>LOCAL-FIRST WORKSPACE • TRUSTED BY LEARNERS</span>
-          <span style={{ marginLeft: '8px', color: 'var(--lp-sage)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-            • <Users size={11} style={{ verticalAlign: 'middle' }} /> {userCount ? `${(4200 + userCount).toLocaleString()} students active` : '4,200+ students active'}
-          </span>
+        <div className="lp-hero-eyebrow">
+          Local-First Productivity Workspace
         </div>
 
         <h1 className="lp-hero-title">
@@ -291,38 +270,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             href="https://github.com/Nirvansingh/Cadence" 
             target="_blank" 
             rel="noopener noreferrer" 
-            className="lp-btn-hero-secondary"
+            className="lp-btn-hero-text"
           >
-            <GithubIcon size={15} />
-            <span>View on GitHub</span>
+            <GithubIcon size={14} />
+            <span>View on GitHub ↗</span>
           </a>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginTop: '14px', fontSize: '11.5px', color: 'var(--lp-text-muted)', fontFamily: 'JetBrains Mono', flexWrap: 'wrap' }}>
-          <span>✓ 100% Free & Open Source</span>
-          <span>•</span>
-          <span>✓ Zero Account Required to Start</span>
-          <span>•</span>
-          <span>✓ Fully Offline Capable</span>
-        </div>
-
-        <div className="lp-trust-strip">
-          <div className="lp-trust-item">
-            <span className="lp-trust-dot" />
-            <span>4,200+ Active Students</span>
-          </div>
-          <div className="lp-trust-item">
-            <span className="lp-trust-dot" />
-            <span>100% Offline Capable</span>
-          </div>
-          <div className="lp-trust-item">
-            <span className="lp-trust-dot" />
-            <span>Zero Analytics or Telemetry</span>
-          </div>
-          <div className="lp-trust-item">
-            <span className="lp-trust-dot" />
-            <span>Encrypted Cloud Sync via Supabase</span>
-          </div>
+        <div className="lp-hero-footnote">
+          Free & open source under MIT • 100% client-side • No account required to start
         </div>
       </section>
 
@@ -1231,7 +1187,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         {/* Global Operational Status Metrics */}
         <div className="lp-metrics-strip">
           <div className="lp-metric-box">
-            <div className="lp-metric-num">{userCount ? `${(4200 + userCount).toLocaleString()}+` : '4,200+'}</div>
+            <div className="lp-metric-num">4,200+</div>
             <div className="lp-metric-label">Active Learners</div>
           </div>
           <div className="lp-metric-box">

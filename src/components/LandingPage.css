@@ -150,37 +150,33 @@
 .lp-header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
-.lp-btn-ghost {
+.lp-nav-link {
+  font-size: 13px;
+  color: var(--lp-text-secondary);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 4px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--lp-text-secondary);
-  background: transparent;
-  border: 1px solid var(--lp-border);
-  border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease;
 }
 
-.lp-btn-ghost:hover {
-  background-color: var(--lp-surface);
+.lp-nav-link:hover {
   color: var(--lp-text-primary);
-  border-color: var(--lp-border-focus);
 }
 
 .lp-btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 6px 14px;
-  font-size: 12px;
+  padding: 7px 16px;
+  font-size: 12.5px;
   font-weight: 600;
   color: #0c0e12;
   background-color: var(--lp-text-primary);
@@ -204,19 +200,14 @@
   width: 100%;
 }
 
-.lp-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.lp-hero-eyebrow {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
-  color: var(--lp-text-secondary);
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 4px 12px;
-  border-radius: 9999px;
-  margin-bottom: 24px;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--lp-sage);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
 }
 
 .lp-hero-title {
@@ -242,7 +233,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .lp-btn-hero-primary {
@@ -290,32 +281,29 @@
   transform: translateY(-2px);
 }
 
-.lp-trust-strip {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 11.5px;
-  border-top: 1px solid var(--lp-border-subtle);
-  padding-top: 20px;
-}
-
-.lp-trust-item {
+.lp-btn-hero-text {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 11px;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--lp-border);
-  color: var(--lp-text-secondary);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
-  transition: border-color 160ms ease;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--lp-text-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
 }
 
-.lp-trust-item:hover {
-  border-color: rgba(255, 255, 255, 0.2);
+.lp-btn-hero-text:hover {
+  color: var(--lp-text-primary);
+}
+
+.lp-hero-footnote {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--lp-text-muted);
+  border-top: 1px solid var(--lp-border-subtle);
+  padding-top: 18px;
+  max-width: 580px;
 }
 
 /* Product Showcase — Authentic UI Mockup (No OS Chrome) */
