@@ -43,7 +43,9 @@
   --scroll-ratio: 0;
 
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
@@ -441,28 +443,29 @@
   max-width: 580px;
 }
 
-/* Product Showcase — Authentic UI Mockup (No OS Chrome) */
-.lp-showcase-section {
+/* Workbench / Interactive Product Showcase */
+.lp-workbench-section {
   max-width: 1040px;
   margin: 0 auto;
   padding: 0 24px 64px;
   width: 100%;
+  box-sizing: border-box;
 }
 
-.lp-showcase-frame {
-  position: relative;
+.lp-workbench {
   background-color: var(--lp-surface);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--lp-border);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 
     0 24px 54px rgba(0, 0, 0, 0.6),
     0 0 0 1px rgba(255, 255, 255, 0.04),
     0 0 80px rgba(99, 102, 241, 0.08);
+  position: relative;
   transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 220ms ease;
 }
 
-.lp-showcase-frame::before {
+.lp-workbench::before {
   content: '';
   position: absolute;
   top: 0;
@@ -473,14 +476,14 @@
   z-index: 10;
 }
 
-.lp-showcase-frame:hover {
+.lp-workbench:hover {
   box-shadow: 
     0 32px 64px rgba(0, 0, 0, 0.7),
     0 0 0 1px rgba(255, 255, 255, 0.1),
-    0 0 100px rgba(99, 102, 241, 0.15);
+    0 0 100px rgba(99, 102, 241, 0.14);
 }
 
-.lp-showcase-topbar {
+.lp-workbench-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -490,75 +493,84 @@
   font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
   color: var(--lp-text-muted);
+  gap: 12px;
 }
 
-.lp-showcase-viewport {
-  display: grid;
-  grid-template-columns: 210px 1fr 300px;
-  min-height: 440px;
-  background-color: #0d1015;
-}
-
-@media (max-width: 960px) {
-  .lp-showcase-viewport {
-    grid-template-columns: 1fr;
-  }
-}
-
-.lp-showcase-sidebar {
-  border-right: 1px solid var(--lp-border);
-  background-color: rgba(255, 255, 255, 0.015);
-  padding: 16px 14px;
+.lp-workbench-dots {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 6px;
 }
 
-.lp-showcase-nav-item {
+.lp-workbench-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.lp-workbench-tabs {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 10px;
-  border-radius: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--lp-border);
+  background-color: #0d1015;
+  padding: 0 8px;
+  gap: 2px;
+  scrollbar-width: none;
+}
+
+.lp-workbench-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.lp-workbench-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
   font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--lp-text-muted);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.lp-workbench-tab:hover {
   color: var(--lp-text-secondary);
-  transition: all 160ms ease;
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
-.lp-showcase-nav-item.active {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #ffffff;
+.lp-workbench-tab.active {
+  color: #f8fafc;
+  border-bottom-color: var(--lp-sage);
+  background-color: var(--lp-surface);
   font-weight: 500;
-  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.lp-showcase-main {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  overflow: hidden;
+.lp-workbench-body {
+  padding: 24px;
+  min-height: 340px;
+  box-sizing: border-box;
 }
 
-.lp-showcase-right {
-  border-left: 1px solid var(--lp-border);
-  background-color: rgba(255, 255, 255, 0.01);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.lp-showcase-footer {
+.lp-workbench-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: rgba(255, 255, 255, 0.015);
   border-top: 1px solid var(--lp-border);
   font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
   color: var(--lp-text-muted);
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 /* Feature Editorial Layout */

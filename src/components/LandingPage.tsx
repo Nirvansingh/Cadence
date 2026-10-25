@@ -328,13 +328,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="lp-workbench">
           {/* Workbench Top Bar */}
           <div className="lp-workbench-topbar">
-            <div className="lp-workbench-dots">
-              <span className="lp-workbench-dot" />
-              <span className="lp-workbench-dot" />
-              <span className="lp-workbench-dot" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className="lp-workbench-dots">
+                <span className="lp-workbench-dot" />
+                <span className="lp-workbench-dot" />
+                <span className="lp-workbench-dot" />
+              </div>
+              <span style={{ color: 'var(--lp-text-secondary)' }}>cadence • student-workspace • v1.0.4-production</span>
             </div>
-            <span>cadence • student-workspace • v1.0.4-production</span>
-            <span>PRESS CTRL+K IN WORKSPACE</span>
+            <span style={{ fontSize: '10.5px', color: 'var(--lp-text-muted)' }}>PRESS CTRL+K IN WORKSPACE</span>
           </div>
 
           {/* Workbench Module Selector */}
