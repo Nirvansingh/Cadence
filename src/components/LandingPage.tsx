@@ -280,7 +280,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Hero Section */}
       <section className="lp-hero-section">
         <div className="lp-hero-eyebrow">
-          Local-First Productivity Workspace
+          Freshly Launched • Ready to Serve
         </div>
 
         <h1 className="lp-hero-title">
@@ -288,7 +288,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </h1>
 
         <p className="lp-hero-lead">
-          Cadence brings together your class timetable, habit tracking, Pomodoro focus timer, tasks, and STEM notes into one fast, local-first tool. Used daily by students and independent researchers worldwide. Zero telemetry, zero cloud tracking.
+          Cadence brings together your class timetable, habit tracking, Pomodoro focus timer, tasks, and STEM notes into one fast, local-first tool. Built with zero telemetry and zero cloud tracking — we have just launched and are ready to serve your focused study workflow.
         </p>
 
         <div className="lp-hero-cta-group">
@@ -319,7 +319,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <div className="lp-hero-footnote">
-          Free & open source under MIT • 100% client-side • No account required to start
+          Free & open source under MIT • 100% client-side • Early Adopter Release
         </div>
       </section>
 
@@ -1378,6 +1378,174 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <p className="lp-essay-text" style={{ marginBottom: 0 }}>
             Engineered with high typographic contrast, keyboard-driven navigation via <span className="mono">Ctrl + K</span>, and zero advertising. It is free, open source under the MIT license, and built to empower focused learning worldwide.
           </p>
+        </div>
+      </section>
+
+      {/* Founding Perspectives & Advisory */}
+      <section className="lp-section">
+        <div className="lp-section-header">
+          <div className="lp-section-index">FOUNDING PERSPECTIVES</div>
+          <h2 className="lp-section-title">Rooted in deep work and human potential</h2>
+          <p className="lp-section-desc">
+            Voices and guidance shaping Cadence from philosophy to engineering.
+          </p>
+        </div>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '16px',
+          marginTop: '20px'
+        }}>
+          {/* 1. Nirvan Singh */}
+          <div style={{
+            backgroundColor: 'var(--lp-surface)',
+            border: '1px solid var(--lp-border)',
+            borderRadius: '6px',
+            padding: '24px 22px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative'
+          }}>
+            <div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '2px 8px',
+                borderRadius: '3px',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                color: 'var(--lp-emerald)',
+                fontSize: '10.5px',
+                fontFamily: 'JetBrains Mono',
+                fontWeight: 600,
+                marginBottom: '14px',
+                letterSpacing: '0.04em'
+              }}>
+                VISION & INITIATIVE
+              </div>
+              <p style={{
+                fontSize: '13.5px',
+                lineHeight: 1.65,
+                color: 'var(--lp-text-primary)',
+                fontStyle: 'italic',
+                marginBottom: '20px'
+              }}>
+                "Cadence was conceived to strip away the algorithmic noise of modern software. When your workspace respects your attention, works completely offline, and operates with zero friction, sustained focus stops being an uphill battle."
+              </p>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--lp-border)', paddingTop: '14px' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc' }}>
+                Nirvan Singh
+              </div>
+              <div style={{ fontSize: '11.5px', color: 'var(--lp-text-secondary)', marginTop: '2px' }}>
+                Founder, Dhiti
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Shweta Sucharia */}
+          <div style={{
+            backgroundColor: 'var(--lp-surface)',
+            border: '1px solid var(--lp-border)',
+            borderRadius: '6px',
+            padding: '24px 22px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative'
+          }}>
+            <div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '2px 8px',
+                borderRadius: '3px',
+                backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                border: '1px solid rgba(14, 165, 233, 0.25)',
+                color: 'var(--lp-sky)',
+                fontSize: '10.5px',
+                fontFamily: 'JetBrains Mono',
+                fontWeight: 600,
+                marginBottom: '14px',
+                letterSpacing: '0.04em'
+              }}>
+                BEHAVIORAL GUIDANCE
+              </div>
+              <p style={{
+                fontSize: '13.5px',
+                lineHeight: 1.65,
+                color: 'var(--lp-text-primary)',
+                fontStyle: 'italic',
+                marginBottom: '20px'
+              }}>
+                "True cognitive momentum requires routines that eliminate guilt and mental friction. Cadence's habit loops and quiet, distraction-free environment allow learners and thinkers to unlock their deep, natural potential."
+              </p>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--lp-border)', paddingTop: '14px' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc' }}>
+                Shweta Sucharia
+              </div>
+              <div style={{ fontSize: '11.5px', color: 'var(--lp-text-secondary)', marginTop: '2px' }}>
+                Co-Founder, LifeSecret • Life Coach & Potential Specialist
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Baljeet Singh */}
+          <div style={{
+            backgroundColor: 'var(--lp-surface)',
+            border: '1px solid var(--lp-border)',
+            borderRadius: '6px',
+            padding: '24px 22px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'relative'
+          }}>
+            <div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '2px 8px',
+                borderRadius: '3px',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                color: 'var(--lp-amber)',
+                fontSize: '10.5px',
+                fontFamily: 'JetBrains Mono',
+                fontWeight: 600,
+                marginBottom: '14px',
+                letterSpacing: '0.04em'
+              }}>
+                PRODUCT & ARCHITECTURE
+              </div>
+              <p style={{
+                fontSize: '13.5px',
+                lineHeight: 1.65,
+                color: 'var(--lp-text-primary)',
+                fontStyle: 'italic',
+                marginBottom: '20px'
+              }}>
+                "In an era where every utility demands your data and constant telemetry, a client-first, deterministic architecture is essential. Cadence is built with engineering discipline, putting the student in total control."
+              </p>
+            </div>
+
+            <div style={{ borderTop: '1px solid var(--lp-border)', paddingTop: '14px' }}>
+              <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#f8fafc' }}>
+                Baljeet Singh
+              </div>
+              <div style={{ fontSize: '11.5px', color: 'var(--lp-text-secondary)', marginTop: '2px' }}>
+                Founder & Technology Strategist, LifeSecret
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
