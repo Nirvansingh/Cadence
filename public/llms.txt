@@ -1,0 +1,12 @@
+# Cadence
+> Fast, local-first daily planner for students and independent learners.
+
+Cadence brings together your class timetable, daily habits, focus timer, tasks, and notes in one fast, private app. No ads, no tracking, and it works completely offline.
+
+## Core Capabilities
+- Class timetable with 24-hour visual schedule and iCalendar (.ics) export
+- Daily habit loops with Duolingo-style flame streaks and freeze shields
+- Offline Pomodoro focus timer with zero-bandwidth procedural ambient noise (brown noise, rainfall)
+- Homework and assignment kanban board
+- Markdown scratchpad notebook with math formulas
+- Offline student utilities: GPA target calculator, radix/base converter, unit converters, AES-GCM credential vault

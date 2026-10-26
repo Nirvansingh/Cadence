@@ -7,11 +7,93 @@
     <title>Cadence — Student Daily Planner & Focus Workspace</title>
     <meta name="description" content="Fast, local-first daily planner for students and independent learners. Daily habits, 24h timetable, offline Pomodoro focus timer, task kanban, and STEM tools. 100% private." />
     <meta name="theme-color" content="#0e1117" />
+    <link rel="canonical" href="https://cadence.nirvaansingh.com/" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://cadence.nirvaansingh.com/" />
+    <meta property="og:title" content="Cadence — Student Daily Planner & Focus Workspace" />
+    <meta property="og:description" content="Fast, local-first daily planner for students and independent learners. Daily habits, 24h timetable, offline Pomodoro focus timer, task kanban, and STEM tools. 100% private." />
+    <meta property="og:image" content="https://cadence.nirvaansingh.com/favicon.svg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:url" content="https://cadence.nirvaansingh.com/" />
+    <meta name="twitter:title" content="Cadence — Student Daily Planner & Focus Workspace" />
+    <meta name="twitter:description" content="Fast, local-first daily planner for students and independent learners." />
+    <meta name="twitter:image" content="https://cadence.nirvaansingh.com/favicon.svg" />
+
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Cadence",
+      "applicationCategory": "EducationalApplication",
+      "operatingSystem": "All",
+      "url": "https://cadence.nirvaansingh.com/",
+      "author": {
+        "@type": "Person",
+        "name": "Nirvan Singh"
+      },
+      "description": "Fast, local-first daily planner for students and independent learners."
+    }
+    </script>
+
+    <!-- Critical CSS for Instant Paint (FCP / LCP optimization) -->
+    <style>
+      body {
+        margin: 0;
+        background-color: #0c0e12;
+        color: #f5f4ef;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      .critical-hero {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 80px 24px 40px;
+        text-align: center;
+      }
+      .critical-eyebrow {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 11px;
+        font-family: monospace;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        margin-bottom: 20px;
+      }
+      .critical-title {
+        font-size: 38px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.18;
+        margin: 0 0 16px 0;
+        color: #f5f4ef;
+      }
+      .critical-lead {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #94a3b8;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="critical-hero">
+        <div class="critical-eyebrow">Freshly Launched • Ready to Serve</div>
+        <h1 class="critical-title">A quiet, simple workspace for your study and daily routines.</h1>
+        <p class="critical-lead">Cadence brings together your class timetable, daily habits, focus timer, tasks, and notes in one fast, private app.</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

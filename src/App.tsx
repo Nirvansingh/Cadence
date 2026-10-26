@@ -1,22 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { Sidebar } from './components/Sidebar';
 import type { NavTab } from './components/Sidebar';
-import { LandingPage } from './components/LandingPage';
-import { OnboardingFlow } from './components/OnboardingFlow';
-import { HabitModule } from './components/HabitModule';
-import { TimetableModule } from './components/TimetableModule';
-import { FocusModule } from './components/FocusModule';
-import { KanbanModule } from './components/KanbanModule';
-import { NotesModule } from './components/NotesModule';
-import { UtilityModule } from './components/UtilityModule';
-import { FriendsModule } from './components/FriendsModule';
-import { StreakStudioModal } from './components/StreakStudioModal';
-import { CommandPalette } from './components/CommandPalette';
-import { CloudSyncModal } from './components/CloudSyncModal';
-import { AuthPage } from './components/AuthPage';
 import { cloudSync, type SyncStatus } from './storage/cloudSyncService';
 import { storage } from './storage/storageAdapter';
 import { Check, Menu, Flame } from 'lucide-react';
+
+// Lazy-load all pages and modules to achieve 100/100 PageSpeed Performance
+const LandingPage = lazy(() => import('./components/LandingPage').then(m => ({ default: m.LandingPage })));
+const HabitModule = lazy(() => import('./components/HabitModule').then(m => ({ default: m.HabitModule })));
+const TimetableModule = lazy(() => import('./components/TimetableModule').then(m => ({ default: m.TimetableModule })));
+const FocusModule = lazy(() => import('./components/FocusModule').then(m => ({ default: m.FocusModule })));
+const KanbanModule = lazy(() => import('./components/KanbanModule').then(m => ({ default: m.KanbanModule })));
+const NotesModule = lazy(() => import('./components/NotesModule').then(m => ({ default: m.NotesModule })));
+const UtilityModule = lazy(() => import('./components/UtilityModule').then(m => ({ default: m.UtilityModule })));
+const FriendsModule = lazy(() => import('./components/FriendsModule').then(m => ({ default: m.FriendsModule })));
+const StreakStudioModal = lazy(() => import('./components/StreakStudioModal').then(m => ({ default: m.StreakStudioModal })));
+const OnboardingFlow = lazy(() => import('./components/OnboardingFlow').then(m => ({ default: m.OnboardingFlow })));
+const CloudSyncModal = lazy(() => import('./components/CloudSyncModal').then(m => ({ default: m.CloudSyncModal })));
+const AuthPage = lazy(() => import('./components/AuthPage').then(m => ({ default: m.AuthPage })));
+const CommandPalette = lazy(() => import('./components/CommandPalette').then(m => ({ default: m.CommandPalette })));
+
+// Ultra-fast lightweight module placeholder
+const ModuleLoader = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', minHeight: '300px', color: 'var(--text-muted)' }}>
+    <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--emerald)', animation: 'spin 0.6s linear infinite' }} />
+  </div>
+);
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('habits');
@@ -175,24 +184,28 @@ export function App() {
 
       {/* View Mode 1: Landing Page */}
       {viewMode === 'landing' && (
-        <LandingPage
-          onStartSetup={() => setViewMode('onboarding')}
-          onExploreDirectly={() => {
-            storage.setOnboardingCompleted(true);
-            setViewMode('workspace');
-          }}
-          onImportBackup={handleTriggerImport}
-          onOpenAuth={() => setViewMode('auth')}
-        />
+        <Suspense fallback={null}>
+          <LandingPage
+            onStartSetup={() => setViewMode('onboarding')}
+            onExploreDirectly={() => {
+              storage.setOnboardingCompleted(true);
+              setViewMode('workspace');
+            }}
+            onImportBackup={handleTriggerImport}
+            onOpenAuth={() => setViewMode('auth')}
+          />
+        </Suspense>
       )}
 
       {/* View Mode 2: Creative Interactive Onboarding Wizard */}
       {viewMode === 'onboarding' && (
-        <OnboardingFlow
-          onComplete={handleOnboardingComplete}
-          onCancel={() => setViewMode('landing')}
-          soundEnabled={soundEnabled}
-        />
+        <Suspense fallback={<ModuleLoader />}>
+          <OnboardingFlow
+            onComplete={handleOnboardingComplete}
+            onCancel={() => setViewMode('landing')}
+            soundEnabled={soundEnabled}
+          />
+        </Suspense>
       )}
 
       {/* View Mode 3: Main Productivity Workspace */}
@@ -240,6 +253,7 @@ export function App() {
                 fontWeight: 700
               }}
               className="mono"
+              aria-label="View Streak Flame"
             >
               <Flame size={13} fill="var(--amber)" />
               <span>{storage.getStreakState().currentStreak}d</span>
@@ -271,65 +285,81 @@ export function App() {
           />
 
           <main key={currentTab} className="animate-pop" style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' }}>
-            {currentTab === 'habits' && <HabitModule soundEnabled={soundEnabled} />}
-            {currentTab === 'timetable' && <TimetableModule soundEnabled={soundEnabled} />}
-            {currentTab === 'focus' && <FocusModule soundEnabled={soundEnabled} />}
-            {currentTab === 'kanban' && <KanbanModule soundEnabled={soundEnabled} />}
-            {currentTab === 'notes' && <NotesModule soundEnabled={soundEnabled} />}
-            {currentTab === 'utilities' && <UtilityModule soundEnabled={soundEnabled} />}
-            {currentTab === 'friends' && (
-              <FriendsModule 
-                soundEnabled={soundEnabled} 
-                onOpenStreakStudio={() => setIsStreakStudioOpen(true)} 
-              />
-            )}
+            <Suspense fallback={<ModuleLoader />}>
+              {currentTab === 'habits' && <HabitModule soundEnabled={soundEnabled} />}
+              {currentTab === 'timetable' && <TimetableModule soundEnabled={soundEnabled} />}
+              {currentTab === 'focus' && <FocusModule soundEnabled={soundEnabled} />}
+              {currentTab === 'kanban' && <KanbanModule soundEnabled={soundEnabled} />}
+              {currentTab === 'notes' && <NotesModule soundEnabled={soundEnabled} />}
+              {currentTab === 'utilities' && <UtilityModule soundEnabled={soundEnabled} />}
+              {currentTab === 'friends' && (
+                <FriendsModule 
+                  soundEnabled={soundEnabled} 
+                  onOpenStreakStudio={() => setIsStreakStudioOpen(true)} 
+                />
+              )}
+            </Suspense>
           </main>
         </div>
       )}
 
       {/* Duolingo Streak Studio & Freezes Modal */}
-      <StreakStudioModal
-        isOpen={isStreakStudioOpen}
-        onClose={() => setIsStreakStudioOpen(false)}
-        soundEnabled={soundEnabled}
-        onStreakUpdate={() => setStreakTick(t => t + 1)}
-      />
+      {isStreakStudioOpen && (
+        <Suspense fallback={null}>
+          <StreakStudioModal
+            isOpen={isStreakStudioOpen}
+            onClose={() => setIsStreakStudioOpen(false)}
+            soundEnabled={soundEnabled}
+            onStreakUpdate={() => setStreakTick(t => t + 1)}
+          />
+        </Suspense>
+      )}
 
       {/* View Mode 4: Dedicated 1/3 Split Cloudflare-Style Auth Portal */}
       {viewMode === 'auth' && (
-        <AuthPage
-          onBackToWorkspace={() => setViewMode('workspace')}
-          onSuccess={() => {
-            setProfile(storage.getProfile());
-            setViewMode('workspace');
-          }}
-        />
+        <Suspense fallback={<ModuleLoader />}>
+          <AuthPage
+            onBackToWorkspace={() => setViewMode('workspace')}
+            onSuccess={() => {
+              setProfile(storage.getProfile());
+              setViewMode('workspace');
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Cloud Sync Modal */}
-      <CloudSyncModal
-        isOpen={isCloudSyncOpen}
-        onClose={() => setIsCloudSyncOpen(false)}
-        onDataSynced={() => {
-          setProfile(storage.getProfile());
-        }}
-        onOpenFullscreenAuth={() => setViewMode('auth')}
-      />
+      {isCloudSyncOpen && (
+        <Suspense fallback={null}>
+          <CloudSyncModal
+            isOpen={isCloudSyncOpen}
+            onClose={() => setIsCloudSyncOpen(false)}
+            onDataSynced={() => {
+              setProfile(storage.getProfile());
+            }}
+            onOpenFullscreenAuth={() => setViewMode('auth')}
+          />
+        </Suspense>
+      )}
 
       {/* Global Command Palette (Ctrl + K) */}
-      <CommandPalette
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        onSelectTab={(tab) => {
-          setViewMode('workspace');
-          setCurrentTab(tab);
-        }}
-        onOpenLanding={() => setViewMode('landing')}
-        onOpenOnboarding={() => setViewMode('onboarding')}
-        soundEnabled={soundEnabled}
-        onToggleSound={handleToggleSound}
-        onExportBackup={handleExportBackup}
-      />
+      {isCommandPaletteOpen && (
+        <Suspense fallback={null}>
+          <CommandPalette
+            isOpen={isCommandPaletteOpen}
+            onClose={() => setIsCommandPaletteOpen(false)}
+            onSelectTab={(tab) => {
+              setViewMode('workspace');
+              setCurrentTab(tab);
+            }}
+            onOpenLanding={() => setViewMode('landing')}
+            onOpenOnboarding={() => setViewMode('onboarding')}
+            soundEnabled={soundEnabled}
+            onToggleSound={handleToggleSound}
+            onExportBackup={handleExportBackup}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

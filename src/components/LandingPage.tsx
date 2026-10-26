@@ -277,55 +277,62 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </nav>
       </header>
 
-      {/* Hero Section */}
-      <section className="lp-hero-section">
-        <div className="lp-hero-eyebrow">
-          Freshly Launched • Ready to Serve
-        </div>
+      {/* Main Landmark for Accessibility (WCAG 2.1) */}
+      <main id="main-content">
+        {/* Hero Section */}
+        <section className="lp-hero-section">
+          <div className="lp-hero-eyebrow">
+            Freshly Launched • Ready to Serve
+          </div>
 
-        <h1 className="lp-hero-title">
-          A quiet, simple workspace for your study and daily routines.
-        </h1>
+          <h1 className="lp-hero-title">
+            A quiet, simple workspace for your study and daily routines.
+          </h1>
 
-        <p className="lp-hero-lead">
-          Cadence brings together your class timetable, daily habits, focus timer, tasks, and notes in one fast, private app. No ads, no tracking, and it works completely offline. We have just started and are ready to help you study with peace of mind.
-        </p>
+          <p className="lp-hero-lead">
+            Cadence brings together your class timetable, daily habits, focus timer, tasks, and notes in one fast, private app. No ads, no tracking, and it works completely offline. We have just started and are ready to help you study with peace of mind.
+          </p>
 
-        <div className="lp-hero-cta-group">
-          <button onClick={onExploreDirectly} className="lp-btn-hero-primary">
-            <span>Launch Web App</span>
-            <ArrowRight size={15} />
-          </button>
+          <div className="lp-hero-cta-group">
+            <button onClick={onExploreDirectly} className="lp-btn-hero-primary">
+              <span>Launch Web App</span>
+              <ArrowRight size={15} />
+            </button>
 
-          <a 
-            href="https://github.com/Nirvansingh/Cadence/releases" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="lp-btn-hero-secondary"
-          >
-            <Download size={15} />
-            <span>Download Desktop (.exe)</span>
-          </a>
+            <a 
+              href="https://github.com/Nirvansingh/Cadence/releases" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="lp-btn-hero-secondary"
+            >
+              <Download size={15} />
+              <span>Download Desktop (.exe)</span>
+            </a>
 
-          <a 
-            href="https://github.com/Nirvansingh/Cadence" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="lp-btn-hero-text"
-          >
-            <GithubIcon size={14} />
-            <span>View on GitHub ↗</span>
-          </a>
-        </div>
+            <a 
+              href="https://github.com/Nirvansingh/Cadence" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="lp-btn-hero-text"
+            >
+              <GithubIcon size={14} />
+              <span>View on GitHub ↗</span>
+            </a>
+          </div>
 
-        <div className="lp-hero-footnote">
-          Free & open source under MIT • 100% client-side • Early Adopter Release
-        </div>
-      </section>
+          <div className="lp-hero-footnote">
+            Free & open source under MIT • 100% client-side • Early Adopter Release
+          </div>
+        </section>
 
-      {/* Product Workspace Showcase (The Visual Centerpiece) */}
-      <section className="lp-workbench-section" aria-label="Cadence Workspace Showcase">
-        <div className="lp-workbench">
+        {/* Product Workspace Showcase (The Visual Centerpiece) */}
+        <section className="lp-workbench-section" aria-label="Cadence Workspace Showcase">
+          {/* Section heading to satisfy sequential heading order (h1 -> h2 -> h3) */}
+          <h2 style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}>
+            Interactive Workspace Showcase
+          </h2>
+
+          <div className="lp-workbench">
           {/* Workbench Top Bar */}
           <div className="lp-workbench-topbar">
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -1662,6 +1669,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         </div>
       </section>
+      </main>
 
       {/* Production Footer */}
       <footer className="lp-footer">

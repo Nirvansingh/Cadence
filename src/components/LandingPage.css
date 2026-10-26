@@ -8,9 +8,9 @@
   --lp-border: rgba(255, 255, 255, 0.08);
   --lp-border-subtle: rgba(255, 255, 255, 0.05);
   --lp-border-focus: rgba(255, 255, 255, 0.2);
-  --lp-text-primary: #f5f4ef;
-  --lp-text-secondary: #9ea5b3;
-  --lp-text-muted: #5e6676;
+  --lp-text-primary: #f8fafc;
+  --lp-text-secondary: #cbd5e1;
+  --lp-text-muted: #94a3b8;
   
   /* Curated Human Palette (Linear / Stripe / Supabase Standards) */
   --lp-emerald: #10b981;
