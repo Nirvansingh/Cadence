@@ -52,9 +52,24 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
   // Ambient sound state
   const [ambientType, setAmbientType] = useState<'none' | 'brown' | 'white' | 'rain'>('none');
   const [ambientVol, setAmbientVol] = useState(0.2);
+  const [activeSubject, setActiveSubject] = useState<string | null>(null);
 
   const timerRef = useRef<number | null>(null);
   const stopwatchRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const handleStartFocus = (e: any) => {
+      if (e.detail?.title) {
+        setActiveSubject(e.detail.title);
+        setActiveTab('pomodoro');
+        setTimeLeft(25 * 60);
+        setIsBreak(false);
+        setIsRunning(true);
+      }
+    };
+    window.addEventListener('cadence-start-focus', handleStartFocus);
+    return () => window.removeEventListener('cadence-start-focus', handleStartFocus);
+  }, []);
 
   const todayStr = getLocalDateString();
   const todayLogs = focusLogs.filter(l => l.dateStr === todayStr);
@@ -290,6 +305,32 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
       {/* Main Focus Viewport */}
       {activeTab === 'pomodoro' ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          {/* Active Target from Timetable / Task */}
+          {activeSubject && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-pill)',
+              backgroundColor: 'var(--sky-subtle)',
+              border: '1px solid var(--sky-border)',
+              color: 'var(--sky)',
+              fontSize: '12px',
+              fontWeight: 600,
+              marginBottom: '18px'
+            }}>
+              <span>Target Focus: <strong>{activeSubject}</strong></span>
+              <button
+                onClick={() => setActiveSubject(null)}
+                style={{ background: 'none', border: 'none', color: 'var(--sky)', cursor: 'pointer', fontSize: '14px', padding: '0 2px' }}
+                title="Clear current target"
+              >
+                ×
+              </button>
+            </div>
+          )}
+
           {/* Preset Buttons & Custom Picker */}
           {!isZenMode && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px', marginBottom: '32px' }}>

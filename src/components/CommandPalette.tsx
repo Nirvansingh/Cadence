@@ -109,6 +109,30 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       action: () => { onSelectTab('utilities'); onClose(); }
     },
     {
+      id: 'quick-focus-25',
+      title: 'Start 25m Focus Sprint',
+      subtitle: 'Instantly boot a 25-minute Pomodoro deep work interval',
+      icon: <Timer size={16} color="var(--rose)" />,
+      category: 'Actions',
+      action: () => {
+        onSelectTab('focus');
+        window.dispatchEvent(new CustomEvent('cadence-start-focus', { detail: { title: 'Deep Work Sprint' } }));
+        onClose();
+      }
+    },
+    {
+      id: 'quick-focus-45',
+      title: 'Start 45m Study Block',
+      subtitle: 'Instantly boot a 45-minute academic curriculum revision block',
+      icon: <Timer size={16} color="var(--amber)" />,
+      category: 'Actions',
+      action: () => {
+        onSelectTab('focus');
+        window.dispatchEvent(new CustomEvent('cadence-start-focus', { detail: { title: 'Curriculum Study Block' } }));
+        onClose();
+      }
+    },
+    {
       id: 'action-toggle-sound',
       title: soundEnabled ? 'Mute Sound Effects' : 'Enable Sound Effects',
       subtitle: soundEnabled ? 'Disable procedural synthesizer clicks and chimes' : 'Turn on rewarding audio clicks and chimes',

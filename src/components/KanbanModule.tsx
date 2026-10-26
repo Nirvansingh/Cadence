@@ -10,7 +10,8 @@ import {
   ArrowLeft,
   CheckSquare,
   Square,
-  ArrowUpDown
+  ArrowUpDown,
+  Timer
 } from 'lucide-react';
 
 interface KanbanModuleProps {
@@ -94,6 +95,13 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
 
   const handleDeleteTask = (taskId: string) => {
     const updated = tasks.filter(t => t.id !== taskId);
+    storage.setTasks(updated);
+    setTasks(updated);
+    playClickSound(soundEnabled);
+  };
+
+  const handleClearDone = () => {
+    const updated = tasks.filter(t => t.status !== 'done');
     storage.setTasks(updated);
     setTasks(updated);
     playClickSound(soundEnabled);
@@ -296,16 +304,37 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
                     {col.label}
                   </span>
                 </div>
-                <span className="mono" style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  backgroundColor: 'var(--bg-card)',
-                  padding: '2px 8px',
-                  borderRadius: '10px',
-                  color: 'var(--text-muted)'
-                }}>
-                  {colTasks.length}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  {col.id === 'done' && colTasks.length > 0 && (
+                    <button
+                      onClick={handleClearDone}
+                      title="Clear all completed tasks"
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                        padding: '1px 5px',
+                        borderRadius: '3px'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--accent-clay)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                    >
+                      Clear
+                    </button>
+                  )}
+                  <span className="mono" style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    backgroundColor: 'var(--bg-card)',
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    color: 'var(--text-muted)'
+                  }}>
+                    {colTasks.length}
+                  </span>
+                </div>
               </div>
 
               {/* Task Cards Column */}
@@ -513,20 +542,48 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
                             )}
                           </div>
 
-                          <button
-                            onClick={() => handleDeleteTask(task.id)}
-                            style={{
-                              background: 'none',
-                              border: 'none',
-                              color: 'var(--text-muted)',
-                              cursor: 'pointer',
-                              padding: '4px'
-                            }}
-                            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--rose)'; }}
-                            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            {col.id !== 'done' && (
+                              <button
+                                onClick={() => {
+                                  playClickSound(soundEnabled);
+                                  window.dispatchEvent(new CustomEvent('cadence-start-focus', { detail: { title: task.title } }));
+                                }}
+                                title="Start 25m Focus session for this task"
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  padding: '3px 8px',
+                                  borderRadius: 'var(--radius-xs)',
+                                  backgroundColor: 'var(--sky-subtle)',
+                                  border: '1px solid var(--sky-border)',
+                                  color: 'var(--sky)',
+                                  fontSize: '11px',
+                                  fontWeight: 500,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                <Timer size={11} />
+                                <span>Focus</span>
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => handleDeleteTask(task.id)}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                color: 'var(--text-muted)',
+                                cursor: 'pointer',
+                                padding: '4px'
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--rose)'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );

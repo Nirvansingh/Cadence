@@ -163,6 +163,48 @@ const MarkdownPreview: React.FC<{ content: string }> = ({ content }) => {
       continue;
     }
 
+    // Markdown Tables (| Header | Header |)
+    if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+      const tableLines: string[] = [line];
+      let nextIdx = i + 1;
+      while (nextIdx < lines.length && lines[nextIdx].trim().startsWith('|') && lines[nextIdx].trim().endsWith('|')) {
+        tableLines.push(lines[nextIdx]);
+        nextIdx++;
+      }
+      if (tableLines.length >= 2) {
+        const headerCells = tableLines[0].split('|').slice(1, -1).map(c => c.trim());
+        const isSeparator = tableLines[1].replace(/[-| :]/g, '').length === 0;
+        const dataRows = isSeparator ? tableLines.slice(2) : tableLines.slice(1);
+        elements.push(
+          <div key={`table_${i}`} style={{ overflowX: 'auto', margin: '14px 0' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-subtle)', backgroundColor: 'var(--bg-card)' }}>
+                  {headerCells.map((h, hIdx) => (
+                    <th key={hIdx} style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--sky)' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {dataRows.map((row, rIdx) => {
+                  const cells = row.split('|').slice(1, -1).map(c => c.trim());
+                  return (
+                    <tr key={rIdx} style={{ borderBottom: '1px solid var(--border-hairline)' }}>
+                      {cells.map((cell, cIdx) => (
+                        <td key={cIdx} style={{ padding: '7px 12px', color: 'var(--text-secondary)' }}>{cell}</td>
+                      ))}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        );
+        i = nextIdx - 1;
+        continue;
+      }
+    }
+
     // Normal paragraph
     elements.push(
       <p key={i} style={{ margin: '4px 0', lineHeight: 1.6, color: 'var(--text-main)' }}>
@@ -181,20 +223,52 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
   const [isPreview, setIsPreview] = useState(false);
   const [showFormulaBar, setShowFormulaBar] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
+  const [showExportMenu, setShowExportMenu] = useState(false);
 
   const activeNote = notes.find(n => n.id === activeNoteId) || notes[0];
 
-  const handleExportNote = () => {
+  const handleExportFormat = (format: 'md' | 'txt' | 'html') => {
     if (!activeNote) return;
-    const blob = new Blob([activeNote.content], { type: 'text/markdown;charset=utf-8' });
+    let mime = 'text/markdown;charset=utf-8';
+    let content = activeNote.content;
+    const ext = format;
+
+    if (format === 'txt') {
+      mime = 'text/plain;charset=utf-8';
+    } else if (format === 'html') {
+      mime = 'text/html;charset=utf-8';
+      content = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${activeNote.title}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #111; background: #fafafa; }
+    h1 { border-bottom: 2px solid #e5e5e5; padding-bottom: 8px; }
+    pre { background: #f0f0f2; padding: 14px; border-radius: 6px; overflow-x: auto; }
+    blockquote { border-left: 3px solid #f59e0b; margin: 0; padding-left: 12px; color: #555; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
+    th { background: #eee; }
+  </style>
+</head>
+<body>
+  <h1>${activeNote.title}</h1>
+  <div style="white-space: pre-wrap;">${activeNote.content.replace(/</g, '&lt;')}</div>
+</body>
+</html>`;
+    }
+
+    const blob = new Blob([content], { type: mime });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `${(activeNote.title || 'untitled').toLowerCase().replace(/\s+/g, '-')}.md`);
+    link.setAttribute('download', `${(activeNote.title || 'untitled').toLowerCase().replace(/\s+/g, '-')}.${ext}`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    setShowExportMenu(false);
     playSuccessChime(soundEnabled);
   };
 
@@ -468,25 +542,110 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
                   <span>{copiedNotice ? 'Copied!' : 'Copy'}</span>
                 </button>
 
-                <button
-                  onClick={handleExportNote}
-                  title="Download as .md file"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    padding: '5px 10px',
-                    borderRadius: 'var(--radius-xs)',
-                    backgroundColor: 'var(--bg-subtle)',
-                    color: 'var(--text-secondary)',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    border: '1px solid var(--border-hairline)'
-                  }}
-                >
-                  <Download size={13} />
-                  <span>.md</span>
-                </button>
+                <div style={{ position: 'relative' }}>
+                  <button
+                    onClick={() => setShowExportMenu(!showExportMenu)}
+                    title="Export note in Markdown, Plain text, or HTML"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      padding: '5px 10px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: 'var(--bg-subtle)',
+                      color: 'var(--text-secondary)',
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      border: '1px solid var(--border-hairline)'
+                    }}
+                  >
+                    <Download size={13} />
+                    <span>Export ▾</span>
+                  </button>
+
+                  {showExportMenu && (
+                    <div className="animate-pop" style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: 0,
+                      marginTop: '6px',
+                      backgroundColor: 'var(--bg-surface)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: 'var(--radius-xs)',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+                      padding: '4px',
+                      zIndex: 100,
+                      minWidth: '130px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px'
+                    }}>
+                      <button
+                        onClick={() => handleExportFormat('md')}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '6px 10px',
+                          border: 'none',
+                          background: 'none',
+                          borderRadius: '3px',
+                          color: 'var(--text-main)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <span>Markdown</span>
+                        <span className="mono" style={{ fontSize: '10px', color: 'var(--sky)' }}>.md</span>
+                      </button>
+                      <button
+                        onClick={() => handleExportFormat('txt')}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '6px 10px',
+                          border: 'none',
+                          background: 'none',
+                          borderRadius: '3px',
+                          color: 'var(--text-main)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <span>Plain Text</span>
+                        <span className="mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>.txt</span>
+                      </button>
+                      <button
+                        onClick={() => handleExportFormat('html')}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '6px 10px',
+                          border: 'none',
+                          background: 'none',
+                          borderRadius: '3px',
+                          color: 'var(--text-main)',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          textAlign: 'left'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                        onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                      >
+                        <span>Web HTML</span>
+                        <span className="mono" style={{ fontSize: '10px', color: 'var(--amber)' }}>.html</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
 
                 <button
                   onClick={() => handleTogglePin(activeNote.id)}
@@ -601,6 +760,27 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
                   }}
                 />
               )}
+            </div>
+
+            {/* Note Footer Stats Bar */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '8px 28px',
+              borderTop: '1px solid var(--border-hairline)',
+              backgroundColor: 'var(--bg-surface)',
+              fontSize: '11px',
+              color: 'var(--text-muted)'
+            }}>
+              <div style={{ display: 'flex', gap: '16px' }} className="mono">
+                <span>{activeNote.content.trim() ? activeNote.content.trim().split(/\s+/).length : 0} words</span>
+                <span>{activeNote.content.length} chars</span>
+                <span>~{Math.max(1, Math.ceil((activeNote.content.trim().split(/\s+/).length || 1) / 200))} min read</span>
+              </div>
+              <span className="mono">
+                Updated {new Date(activeNote.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </div>
           </>
         ) : (

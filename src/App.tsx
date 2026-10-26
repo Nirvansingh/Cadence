@@ -55,14 +55,32 @@ export function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Global Cross-Module Event Bus
   useEffect(() => {
-    const updated = { ...profile, soundEnabled };
-    storage.setProfile(updated);
-    setProfile(updated);
-  }, [soundEnabled]);
+    const handleStartFocus = () => {
+      setViewMode('workspace');
+      setCurrentTab('focus');
+    };
+    const handleSwitchTab = (e: any) => {
+      if (e.detail?.tab) {
+        setViewMode('workspace');
+        setCurrentTab(e.detail.tab);
+      }
+    };
+    window.addEventListener('cadence-start-focus', handleStartFocus);
+    window.addEventListener('cadence-switch-tab', handleSwitchTab);
+    return () => {
+      window.removeEventListener('cadence-start-focus', handleStartFocus);
+      window.removeEventListener('cadence-switch-tab', handleSwitchTab);
+    };
+  }, []);
 
   const handleToggleSound = () => {
-    setSoundEnabled(!soundEnabled);
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    const updated = { ...profile, soundEnabled: next };
+    storage.setProfile(updated);
+    setProfile(updated);
   };
 
   const handleExportBackup = () => {

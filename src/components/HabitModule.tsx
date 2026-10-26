@@ -14,7 +14,9 @@ import {
   Flame,
   Zap,
   RotateCcw,
-  Gift
+  Gift,
+  LayoutList,
+  Grid
 } from 'lucide-react';
 
 interface HabitModuleProps {
@@ -26,6 +28,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   const [logs, setLogs] = useState<HabitLog[]>(() => storage.getHabitLogs());
   const [expandedHabitId, setExpandedHabitId] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'matrix'>('list');
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
 
   // New Habit form state
@@ -44,12 +47,12 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     return logs.some(l => l.habitId === habitId && l.completedDate === dateStr);
   };
 
-  const handleToggleHabit = (habitId: string) => {
-    const isCompletedNow = storage.toggleHabitLog(habitId, todayStr);
+  const handleToggleHabitForDate = (habitId: string, dateStr: string) => {
+    const isCompletedNow = storage.toggleHabitLog(habitId, dateStr);
     const updatedLogs = storage.getHabitLogs();
     setLogs([...updatedLogs]);
 
-    if (isCompletedNow) {
+    if (isCompletedNow && dateStr === todayStr) {
       playClickSound(soundEnabled);
       const completedToday = habits.filter(h => updatedLogs.some(l => l.habitId === h.id && l.completedDate === todayStr)).length;
       if (completedToday === habits.length && habits.length > 0) {
@@ -64,6 +67,10 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     } else {
       playClickSound(soundEnabled);
     }
+  };
+
+  const handleToggleHabit = (habitId: string) => {
+    handleToggleHabitForDate(habitId, todayStr);
   };
 
   const calculateStreak = (habit: Habit): number => {
@@ -102,6 +109,24 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     return days;
   };
   const weekDays = getLast7Days();
+
+  const getLast30Days = () => {
+    const days: { dateStr: string; dayNum: number; weekday: string; isToday: boolean }[] = [];
+    const labels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const str = getLocalDateString(d);
+      days.push({ 
+        dateStr: str, 
+        dayNum: d.getDate(),
+        weekday: labels[d.getDay()],
+        isToday: i === 0
+      });
+    }
+    return days;
+  };
+  const monthDays = getLast30Days();
 
   const filteredHabits = habits.filter(h => {
     if (selectedFilter === 'all') return true;
@@ -267,39 +292,262 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '20px' }}>
-        {[
-          { id: 'all', label: 'All Habits' },
-          { id: 'morning', label: 'Morning' },
-          { id: 'study', label: 'Study' },
-          { id: 'coding', label: 'Coding' },
-          { id: 'routine', label: 'Evening' },
-        ].map(filter => {
-          const isSel = selectedFilter === filter.id;
-          return (
-            <button
-              key={filter.id}
-              onClick={() => setSelectedFilter(filter.id)}
-              style={{
-                padding: '6px 14px',
-                borderRadius: 'var(--radius-pill)',
-                fontSize: '12px',
-                fontWeight: isSel ? 600 : 500,
-                backgroundColor: isSel ? 'var(--bg-subtle)' : 'transparent',
-                color: isSel ? 'var(--text-pure)' : 'var(--text-muted)',
-                border: '1px solid',
-                borderColor: isSel ? 'var(--border-subtle)' : 'transparent',
-                transition: 'var(--transition-fast)'
-              }}
-            >
-              {filter.label}
-            </button>
-          );
-        })}
+      {/* Filter Tabs & View Toggle */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          {[
+            { id: 'all', label: 'All Habits' },
+            { id: 'morning', label: 'Morning' },
+            { id: 'study', label: 'Study' },
+            { id: 'coding', label: 'Coding' },
+            { id: 'routine', label: 'Evening' },
+          ].map(filter => {
+            const isSel = selectedFilter === filter.id;
+            return (
+              <button
+                key={filter.id}
+                onClick={() => setSelectedFilter(filter.id)}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-pill)',
+                  fontSize: '12px',
+                  fontWeight: isSel ? 600 : 500,
+                  backgroundColor: isSel ? 'var(--bg-subtle)' : 'transparent',
+                  color: isSel ? 'var(--text-pure)' : 'var(--text-muted)',
+                  border: '1px solid',
+                  borderColor: isSel ? 'var(--border-subtle)' : 'transparent',
+                  transition: 'var(--transition-fast)'
+                }}
+              >
+                {filter.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* View Switcher: List vs 30-Day Matrix */}
+        <div style={{
+          display: 'inline-flex',
+          padding: '3px',
+          borderRadius: 'var(--radius-sm)',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-hairline)',
+          gap: '2px'
+        }}>
+          <button
+            onClick={() => setViewMode('list')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '5px 12px',
+              borderRadius: 'var(--radius-xs)',
+              fontSize: '12px',
+              fontWeight: viewMode === 'list' ? 600 : 500,
+              backgroundColor: viewMode === 'list' ? 'var(--bg-subtle)' : 'transparent',
+              color: viewMode === 'list' ? 'var(--text-pure)' : 'var(--text-muted)',
+              border: viewMode === 'list' ? '1px solid var(--border-subtle)' : '1px solid transparent',
+              transition: 'var(--transition-fast)',
+              cursor: 'pointer'
+            }}
+          >
+            <LayoutList size={13} />
+            <span>List & Loop</span>
+          </button>
+          <button
+            onClick={() => setViewMode('matrix')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '5px 12px',
+              borderRadius: 'var(--radius-xs)',
+              fontSize: '12px',
+              fontWeight: viewMode === 'matrix' ? 600 : 500,
+              backgroundColor: viewMode === 'matrix' ? 'var(--bg-subtle)' : 'transparent',
+              color: viewMode === 'matrix' ? 'var(--text-pure)' : 'var(--text-muted)',
+              border: viewMode === 'matrix' ? '1px solid var(--border-subtle)' : '1px solid transparent',
+              transition: 'var(--transition-fast)',
+              cursor: 'pointer'
+            }}
+          >
+            <Grid size={13} />
+            <span>30-Day Matrix</span>
+          </button>
+        </div>
       </div>
 
-      {/* Routine Cards */}
+      {viewMode === 'matrix' ? (
+        <div className="panel-card animate-quiet" style={{ padding: '22px', overflowX: 'auto', backgroundColor: 'var(--bg-surface)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-pure)' }}>
+                30-Day Consistency Matrix
+              </h3>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>
+                Interactive monthly heatmap • Click any cell to mark or adjust completion
+              </p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '3px', backgroundColor: 'var(--emerald)' }} />
+                <span>Done</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '3px', backgroundColor: 'var(--bg-subtle)', border: '1px solid var(--border-hairline)' }} />
+                <span>Missed</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <div style={{ width: '12px', height: '12px', borderRadius: '3px', border: '1px solid var(--sky)', backgroundColor: 'transparent' }} />
+                <span>Today</span>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ overflowX: 'auto', paddingBottom: '8px' }}>
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '3px', minWidth: '780px' }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: 'left', padding: '6px 10px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', width: '200px' }}>
+                    HABIT
+                  </th>
+                  {monthDays.map(d => (
+                    <th
+                      key={d.dateStr}
+                      style={{
+                        padding: '4px 2px',
+                        textAlign: 'center',
+                        fontSize: '10px',
+                        fontWeight: d.isToday ? 700 : 500,
+                        color: d.isToday ? 'var(--sky)' : 'var(--text-muted)',
+                        backgroundColor: d.isToday ? 'var(--sky-subtle)' : 'transparent',
+                        borderRadius: 'var(--radius-xs)'
+                      }}
+                      className="mono"
+                      title={d.dateStr}
+                    >
+                      <div style={{ fontSize: '9px', opacity: 0.8 }}>{d.weekday}</div>
+                      <div>{d.dayNum}</div>
+                    </th>
+                  ))}
+                  <th style={{ textAlign: 'center', padding: '6px 8px', fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', width: '70px' }}>
+                    30D RATE
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredHabits.map(habit => {
+                  const habitMonthCompletions = monthDays.filter(d => isHabitCompleted(habit.id, d.dateStr)).length;
+                  const ratePct = Math.round((habitMonthCompletions / 30) * 100);
+                  const streak = calculateStreak(habit);
+
+                  return (
+                    <tr key={habit.id}>
+                      <td style={{ padding: '6px 8px', verticalAlign: 'middle' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            width: '3px',
+                            height: '14px',
+                            borderRadius: '2px',
+                            backgroundColor: habit.category === 'health' ? 'var(--emerald)' : habit.category === 'study' ? 'var(--sky)' : habit.category === 'coding' ? 'var(--violet)' : 'var(--amber)',
+                            flexShrink: 0
+                          }} />
+                          <span style={{
+                            fontSize: '12.5px',
+                            fontWeight: 600,
+                            color: 'var(--text-pure)',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '130px'
+                          }} title={habit.title}>
+                            {habit.title}
+                          </span>
+                          {streak > 0 && (
+                            <span style={{ fontSize: '10px', color: 'var(--amber)', fontWeight: 700 }} className="mono">
+                              {streak}d
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {monthDays.map(d => {
+                        const done = isHabitCompleted(habit.id, d.dateStr);
+                        return (
+                          <td key={d.dateStr} style={{ textAlign: 'center', padding: '1px' }}>
+                            <button
+                              onClick={() => handleToggleHabitForDate(habit.id, d.dateStr)}
+                              title={`${habit.title} - ${d.dateStr}: ${done ? 'Completed' : 'Missed'}`}
+                              style={{
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '3px',
+                                border: d.isToday ? '1px solid var(--sky)' : '1px solid transparent',
+                                backgroundColor: done ? 'var(--emerald)' : 'var(--bg-subtle)',
+                                color: done ? '#090b10' : 'transparent',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'transform 0.1s ease, background-color 0.15s ease',
+                                padding: 0
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.2)'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
+                            >
+                              {done && <Check size={11} strokeWidth={3} />}
+                            </button>
+                          </td>
+                        );
+                      })}
+
+                      <td style={{ textAlign: 'center', padding: '6px 8px', verticalAlign: 'middle' }}>
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          color: ratePct >= 70 ? 'var(--emerald)' : ratePct >= 40 ? 'var(--sky)' : 'var(--text-muted)'
+                        }} className="mono">
+                          {ratePct}%
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td style={{ padding: '8px 10px', fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                    Daily Total
+                  </td>
+                  {monthDays.map(d => {
+                    const countForDay = filteredHabits.filter(h => isHabitCompleted(h.id, d.dateStr)).length;
+                    const allDone = countForDay === filteredHabits.length && filteredHabits.length > 0;
+                    return (
+                      <td
+                        key={d.dateStr}
+                        style={{
+                          textAlign: 'center',
+                          fontSize: '10px',
+                          fontWeight: allDone ? 700 : 500,
+                          color: allDone ? 'var(--emerald)' : countForDay > 0 ? 'var(--text-pure)' : 'var(--text-muted)',
+                          padding: '6px 1px'
+                        }}
+                        className="mono"
+                      >
+                        {countForDay}
+                      </td>
+                    );
+                  })}
+                  <td style={{ textAlign: 'center', fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }} className="mono">
+                    {weeklyConsistency}%
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      ) : (
+      /* Routine Cards */
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {filteredHabits.length === 0 ? (
           <div style={{
@@ -555,6 +803,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
         })
       )}
       </div>
+      )}
 
       {/* Add Modal */}
       {showAddModal && (

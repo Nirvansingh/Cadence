@@ -12,7 +12,10 @@ import {
   Check, 
   AlertTriangle,
   Layers,
-  Radio
+  Radio,
+  Sparkles,
+  Timer,
+  RotateCcw
 } from 'lucide-react';
 
 interface TimetableModuleProps {
@@ -20,6 +23,64 @@ interface TimetableModuleProps {
 }
 
 const DAYS: DayOfWeek[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+interface ScheduleTemplate {
+  id: string;
+  name: string;
+  desc: string;
+  badge: string;
+  slots: Omit<TimetableSlot, 'id' | 'dayOfWeek' | 'createdAt' | 'updatedAt' | 'sortOrder'>[];
+}
+
+const SCHEDULE_TEMPLATES: ScheduleTemplate[] = [
+  {
+    id: 'school_tuition',
+    name: 'High School + Tuition Track',
+    badge: 'Curriculum & Coaching',
+    desc: 'Structured school routine, commute buffers, evening tuitions & homework review.',
+    slots: [
+      { startTime: '07:00', endTime: '07:45', title: 'Morning Ignition & Breakfast', category: 'meals', note: 'Hydrate, breakfast, pack bag' },
+      { startTime: '08:00', endTime: '14:30', title: 'School Lectures & Labs', category: 'school', note: 'Core STEM curriculum' },
+      { startTime: '15:00', endTime: '16:30', title: 'Homework & Formula Review', category: 'study', note: 'Active recall and notes synthesis' },
+      { startTime: '17:00', endTime: '19:00', title: 'Physics & Math Coaching', category: 'tuition', note: 'Problem solving & test series' },
+      { startTime: '19:30', endTime: '20:30', title: 'Dinner & Mindful Reset', category: 'meals', note: 'Walk, unwind, family time' },
+      { startTime: '20:30', endTime: '22:30', title: 'Self-Study & Problem Sets', category: 'study', note: 'Daily 2-hour deep work sprint' },
+      { startTime: '23:00', endTime: '06:45', title: 'Deep Sleep & Recovery', category: 'sleep', note: 'Consistent restorative rest' }
+    ]
+  },
+  {
+    id: 'dev_sprint',
+    name: 'Self-Taught Dev Sprint',
+    badge: 'Code & Architecture',
+    desc: 'Optimized for high-velocity software engineering, open-source building, and fitness.',
+    slots: [
+      { startTime: '08:00', endTime: '09:00', title: 'Morning Workout & Breakfast', category: 'workout', note: 'Physical strength & high protein' },
+      { startTime: '09:30', endTime: '12:30', title: 'Deep Architecture & Feature Dev', category: 'study', note: 'No distractions, deep coding block' },
+      { startTime: '13:00', endTime: '14:00', title: 'Lunch & Fresh Air', category: 'meals', note: 'Screen-free break' },
+      { startTime: '14:30', endTime: '17:00', title: 'Bug Fixing, Testing & PRs', category: 'study', note: 'Code review and unit tests' },
+      { startTime: '17:30', endTime: '18:30', title: 'Cardio / Evening Walk', category: 'workout', note: 'Reset mental energy' },
+      { startTime: '19:30', endTime: '20:30', title: 'Dinner', category: 'meals' },
+      { startTime: '21:00', endTime: '22:30', title: 'Side Projects & Reading', category: 'study', note: 'Explore new tech & read docs' },
+      { startTime: '23:00', endTime: '07:30', title: 'Sleep', category: 'sleep' }
+    ]
+  },
+  {
+    id: 'exam_revision',
+    name: 'Exam Revision Week',
+    badge: 'Mock Papers & Recall',
+    desc: 'High-intensity mock papers, mistake log retrospectives, and spaced repetition.',
+    slots: [
+      { startTime: '07:00', endTime: '08:00', title: 'Formula Flashcards & Quick Recall', category: 'study', note: 'Spaced repetition flashcards' },
+      { startTime: '08:30', endTime: '11:30', title: 'Full Mock Paper Simulation (Block 1)', category: 'study', note: 'Exam conditions, strictly timed' },
+      { startTime: '12:00', endTime: '13:00', title: 'Nutritious Lunch & Rest', category: 'meals' },
+      { startTime: '13:30', endTime: '16:30', title: 'Full Mock Paper Simulation (Block 2)', category: 'study', note: 'Second timed subject paper' },
+      { startTime: '17:00', endTime: '18:30', title: 'Error Log & Mistake Analysis', category: 'study', note: 'Document every missed question' },
+      { startTime: '19:30', endTime: '20:30', title: 'Dinner & Decompress', category: 'meals' },
+      { startTime: '21:00', endTime: '22:15', title: 'Light Flashcard Review', category: 'other', note: 'No heavy screen, calm review' },
+      { startTime: '22:45', endTime: '06:45', title: 'Sleep & Memory Consolidation', category: 'sleep' }
+    ]
+  }
+];
 
 // Rich, high-contrast jewel palette for timetable
 const CATEGORY_PALETTE: Record<TimetableCategory, { hex: string; label: string; text: string; bg: string }> = {
@@ -38,6 +99,8 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
   const [now, setNow] = useState<Date>(() => new Date());
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showCopyModal, setShowCopyModal] = useState<boolean>(false);
+  const [showTemplateModal, setShowTemplateModal] = useState<boolean>(false);
+  const [templateScope, setTemplateScope] = useState<'day' | 'weekdays' | 'all'>('day');
   const [exportNotice, setExportNotice] = useState<boolean>(false);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
 
@@ -96,7 +159,22 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
     ? toMinutes(nextUpcomingSlot.startTime) - currentMinutes
     : 0;
 
-  // Logic: Live Conflict / Overlap Detection
+  // Global Conflict & Collision Detection across existing daySlots
+  const conflictSlotIds = new Set<string>();
+  for (let i = 0; i < daySlots.length; i++) {
+    for (let j = i + 1; j < daySlots.length; j++) {
+      const aStart = toMinutes(daySlots[i].startTime);
+      const aEnd = toMinutes(daySlots[i].endTime);
+      const bStart = toMinutes(daySlots[j].startTime);
+      const bEnd = toMinutes(daySlots[j].endTime);
+      if (aStart < bEnd && aEnd > bStart) {
+        conflictSlotIds.add(daySlots[i].id);
+        conflictSlotIds.add(daySlots[j].id);
+      }
+    }
+  }
+
+  // Logic: Live Conflict / Overlap Detection for the Add modal
   const conflictingSlot = daySlots.find(s => {
     const sStart = toMinutes(s.startTime);
     const sEnd = toMinutes(s.endTime);
@@ -235,6 +313,63 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
     setTimeout(() => setCopyNotice(null), 3500);
   };
 
+  // Logic: Pre-populated Learner Templates Application
+  const handleApplyTemplate = (template: ScheduleTemplate) => {
+    let targetDays: DayOfWeek[] = [];
+    if (templateScope === 'day') {
+      targetDays = [selectedDay];
+    } else if (templateScope === 'weekdays') {
+      targetDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    } else {
+      targetDays = DAYS;
+    }
+
+    const cleanOther = slots.filter(s => !targetDays.includes(s.dayOfWeek));
+    const generated: TimetableSlot[] = [];
+
+    targetDays.forEach(day => {
+      template.slots.forEach((item, idx) => {
+        generated.push({
+          ...item,
+          id: `slot_${day}_${template.id}_${Date.now()}_${idx}`,
+          dayOfWeek: day,
+          sortOrder: idx + 1,
+          createdAt: Date.now(),
+          updatedAt: Date.now()
+        });
+      });
+    });
+
+    const merged = [...cleanOther, ...generated];
+    storage.setTimetable(merged);
+    setSlots(merged);
+    playSuccessChime(soundEnabled);
+    setShowTemplateModal(false);
+    setCopyNotice(`Applied "${template.name}" to ${targetDays.length} day(s)`);
+    setTimeout(() => setCopyNotice(null), 3500);
+  };
+
+  // Logic: Reset / Clear current day routine
+  const handleClearDay = () => {
+    if (daySlots.length === 0) return;
+    const remaining = slots.filter(s => s.dayOfWeek !== selectedDay);
+    storage.setTimetable(remaining);
+    setSlots(remaining);
+    playClickSound(soundEnabled);
+    setCopyNotice(`Cleared all events for ${selectedDay}`);
+    setTimeout(() => setCopyNotice(null), 3000);
+  };
+
+  // Logic: Cross-module focus launcher
+  const handleLaunchFocus = (slot: TimetableSlot) => {
+    playClickSound(soundEnabled);
+    window.dispatchEvent(new CustomEvent('cadence-start-focus', { 
+      detail: { title: slot.title, category: slot.category } 
+    }));
+    setCopyNotice(`Launching focus session for "${slot.title}"...`);
+    setTimeout(() => setCopyNotice(null), 2500);
+  };
+
   return (
     <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1000px', margin: '0 auto' }}>
       {/* Toast Notification */}
@@ -298,6 +433,26 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
 
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <button
+            onClick={() => setShowTemplateModal(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '9px 12px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--bg-subtle)',
+              color: 'var(--amber)',
+              fontSize: '12px',
+              fontWeight: 500,
+              border: '1px solid rgba(245, 158, 11, 0.25)',
+              cursor: 'pointer'
+            }}
+          >
+            <Sparkles size={13} color="var(--amber)" />
+            <span>Templates</span>
+          </button>
+
+          <button
             onClick={handleInsertBuffers}
             style={{
               display: 'flex',
@@ -336,6 +491,28 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
             <Layers size={13} color="var(--sky)" />
             <span>Copy Schedule</span>
           </button>
+
+          {daySlots.length > 0 && (
+            <button
+              onClick={handleClearDay}
+              title={`Clear all ${daySlots.length} events for ${selectedDay}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '9px 11px',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: 'var(--bg-subtle)',
+                color: 'var(--text-muted)',
+                fontSize: '12px',
+                border: '1px solid var(--border-subtle)',
+                cursor: 'pointer'
+              }}
+            >
+              <RotateCcw size={12} />
+              <span>Reset</span>
+            </button>
+          )}
 
           <button
             onClick={handleExportICS}
@@ -592,6 +769,27 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
         </div>
       </div>
 
+      {/* Conflict / Overlap Alert Banner */}
+      {conflictSlotIds.size > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '12px 18px',
+          borderRadius: 'var(--radius-sm)',
+          backgroundColor: 'rgba(245, 158, 11, 0.12)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          color: 'var(--amber)',
+          fontSize: '12.5px',
+          marginBottom: '16px'
+        }}>
+          <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+          <span>
+            <strong>Schedule Collision Detected:</strong> Overlapping events found on {selectedDay}. Review the highlighted events below to eliminate double-booking.
+          </span>
+        </div>
+      )}
+
       {/* Events List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {daySlots.length === 0 ? (
@@ -605,25 +803,46 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
             fontSize: '13px'
           }}>
             <p>No events scheduled for {selectedDay}.</p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              style={{
-                marginTop: '12px',
-                padding: '7px 14px',
-                borderRadius: 'var(--radius-xs)',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--border-subtle)',
-                color: 'var(--sky)',
-                fontSize: '12px',
-                cursor: 'pointer'
-              }}
-            >
-              + Add First Event
-            </button>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '14px' }}>
+              <button
+                onClick={() => setShowTemplateModal(true)}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: 'var(--amber)',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Sparkles size={13} />
+                <span>Load Learner Template</span>
+              </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--sky)',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                + Add Custom Event
+              </button>
+            </div>
           </div>
         ) : (
           daySlots.map(slot => {
             const catInfo = CATEGORY_PALETTE[slot.category];
+            const isConflicted = conflictSlotIds.has(slot.id);
             let durMin = toMinutes(slot.endTime) - toMinutes(slot.startTime);
             if (durMin < 0) durMin += 24 * 60;
             const durFormatted = durMin >= 60 
@@ -640,8 +859,9 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                   padding: '14px 18px',
                   backgroundColor: 'var(--bg-surface)',
                   borderRadius: 'var(--radius-sm)',
-                  border: '1px solid var(--border-hairline)',
-                  borderLeft: `4px solid ${catInfo.hex}`,
+                  border: isConflicted ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid var(--border-hairline)',
+                  borderLeft: `4px solid ${isConflicted ? 'var(--amber)' : catInfo.hex}`,
+                  boxShadow: isConflicted ? '0 0 12px rgba(245, 158, 11, 0.1)' : 'none',
                   transition: 'all 0.15s ease'
                 }}
               >
@@ -656,7 +876,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                   </div>
 
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-pure)' }}>
                         {slot.title}
                       </span>
@@ -671,6 +891,23 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                       }} className="mono">
                         {catInfo.label}
                       </span>
+
+                      {isConflicted && (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          fontSize: '10.5px',
+                          fontWeight: 600,
+                          padding: '1px 7px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                          color: 'var(--amber)',
+                          border: '1px solid rgba(245, 158, 11, 0.35)'
+                        }}>
+                          <AlertTriangle size={11} /> Overlapping
+                        </span>
+                      )}
                     </div>
 
                     {slot.note && (
@@ -681,20 +918,45 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleDeleteSlot(slot.id)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-muted)',
-                    cursor: 'pointer',
-                    padding: '6px'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--rose)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {(slot.category === 'study' || slot.category === 'tuition' || slot.category === 'school') && (
+                    <button
+                      onClick={() => handleLaunchFocus(slot)}
+                      title="Launch Focus Session for this subject"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px',
+                        padding: '5px 10px',
+                        borderRadius: 'var(--radius-xs)',
+                        backgroundColor: 'var(--sky-subtle)',
+                        border: '1px solid var(--sky-border)',
+                        color: 'var(--sky)',
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Timer size={12} />
+                      <span>Focus</span>
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => handleDeleteSlot(slot.id)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      padding: '6px'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--rose)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             );
           })
@@ -1038,6 +1300,211 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
                 }}
               >
                 Apply to {selectedTargetDays.length} Days
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pre-populated Schedule Templates Modal */}
+      {showTemplateModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          backdropFilter: 'blur(6px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div className="animate-pop" style={{
+            width: '560px',
+            maxWidth: '92vw',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            backgroundColor: 'var(--bg-surface)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: 'var(--radius-md)',
+            padding: '24px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={16} color="var(--amber)" />
+                <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-pure)' }}>
+                  Learner Schedule Templates
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '18px' }}
+              >
+                ×
+              </button>
+            </div>
+
+            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+              Select a battle-tested routine designed for high schoolers, self-taught coders, and exam revision:
+            </p>
+
+            {/* Scope selector */}
+            <div style={{ marginBottom: '18px', padding: '10px 14px', borderRadius: 'var(--radius-xs)', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-hairline)' }}>
+              <label style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                Apply To:
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setTemplateScope('day')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: templateScope === 'day' ? 'var(--sky-subtle)' : 'transparent',
+                    border: '1px solid',
+                    borderColor: templateScope === 'day' ? 'var(--sky-border)' : 'var(--border-subtle)',
+                    color: templateScope === 'day' ? 'var(--sky)' : 'var(--text-secondary)',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {selectedDay} Only
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTemplateScope('weekdays')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: templateScope === 'weekdays' ? 'var(--sky-subtle)' : 'transparent',
+                    border: '1px solid',
+                    borderColor: templateScope === 'weekdays' ? 'var(--sky-border)' : 'var(--border-subtle)',
+                    color: templateScope === 'weekdays' ? 'var(--sky)' : 'var(--text-secondary)',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Weekdays (Mon – Fri)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTemplateScope('all')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: templateScope === 'all' ? 'var(--sky-subtle)' : 'transparent',
+                    border: '1px solid',
+                    borderColor: templateScope === 'all' ? 'var(--sky-border)' : 'var(--border-subtle)',
+                    color: templateScope === 'all' ? 'var(--sky)' : 'var(--text-secondary)',
+                    fontSize: '12px',
+                    fontWeight: 500,
+                    cursor: 'pointer'
+                  }}
+                >
+                  All 7 Days
+                </button>
+              </div>
+            </div>
+
+            {/* Template cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
+              {SCHEDULE_TEMPLATES.map(tpl => (
+                <div
+                  key={tpl.id}
+                  style={{
+                    padding: '16px',
+                    borderRadius: 'var(--radius-sm)',
+                    backgroundColor: 'var(--bg-card)',
+                    border: '1px solid var(--border-hairline)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '10px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-pure)' }}>
+                          {tpl.name}
+                        </span>
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 600,
+                          padding: '2px 7px',
+                          borderRadius: 'var(--radius-pill)',
+                          backgroundColor: 'rgba(245, 158, 11, 0.12)',
+                          color: 'var(--amber)',
+                          border: '1px solid rgba(245, 158, 11, 0.25)'
+                        }}>
+                          {tpl.badge}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '3px' }}>
+                        {tpl.desc}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleApplyTemplate(tpl)}
+                      style={{
+                        padding: '7px 14px',
+                        borderRadius: 'var(--radius-xs)',
+                        backgroundColor: 'var(--sky)',
+                        color: '#090b10',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        border: 'none',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      Load Template
+                    </button>
+                  </div>
+
+                  {/* Micro timeline preview */}
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '6px',
+                    paddingTop: '8px',
+                    borderTop: '1px dashed var(--border-hairline)'
+                  }}>
+                    {tpl.slots.map((s, idx) => (
+                      <span
+                        key={idx}
+                        style={{
+                          fontSize: '10.5px',
+                          padding: '2px 6px',
+                          borderRadius: '3px',
+                          backgroundColor: 'var(--bg-surface)',
+                          border: '1px solid var(--border-subtle)',
+                          color: 'var(--text-secondary)'
+                        }}
+                      >
+                        {s.startTime} {s.title}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowTemplateModal(false)}
+                style={{
+                  padding: '7px 14px',
+                  borderRadius: 'var(--radius-xs)',
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'transparent',
+                  border: '1px solid var(--border-subtle)',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
               </button>
             </div>
           </div>
