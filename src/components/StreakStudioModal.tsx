@@ -102,10 +102,12 @@ export const StreakStudioModal: React.FC<StreakStudioModalProps> = ({
         style={{
           width: '100%',
           maxWidth: '520px',
+          maxHeight: '90vh',
+          overflowY: 'auto',
           backgroundColor: 'var(--bg-surface)',
           border: '1px solid var(--border-subtle)',
           borderRadius: 'var(--radius-lg)',
-          padding: '28px',
+          padding: '24px 20px',
           position: 'relative',
           boxShadow: '0 24px 64px rgba(0, 0, 0, 0.65)'
         }}
@@ -203,6 +205,7 @@ export const StreakStudioModal: React.FC<StreakStudioModalProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
           gap: '14px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -279,51 +282,53 @@ export const StreakStudioModal: React.FC<StreakStudioModalProps> = ({
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(14, 1fr)', gap: '4px' }}>
-            {streakDays.map(d => {
-              const bg = d.wasActive 
-                ? 'var(--amber)' 
-                : d.wasFrozen 
-                ? 'var(--sky)' 
-                : d.isToday 
-                ? 'rgba(255, 255, 255, 0.08)' 
-                : 'var(--bg-card)';
+          <div style={{ overflowX: 'auto', paddingBottom: '4px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(14, 1fr)', gap: '4px', minWidth: '380px' }}>
+              {streakDays.map(d => {
+                const bg = d.wasActive 
+                  ? 'var(--amber)' 
+                  : d.wasFrozen 
+                  ? 'var(--sky)' 
+                  : d.isToday 
+                  ? 'rgba(255, 255, 255, 0.08)' 
+                  : 'var(--bg-card)';
 
-              return (
-                <div
-                  key={d.dateStr}
-                  title={`${d.dateStr}: ${d.wasActive ? 'Studied 🔥' : d.wasFrozen ? 'Freeze Used 🧊' : 'Not completed'}`}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '6px 2px',
-                    borderRadius: 'var(--radius-xs)',
-                    backgroundColor: d.isToday ? 'rgba(245, 158, 11, 0.08)' : 'var(--bg-app)',
-                    border: d.isToday ? '1px solid var(--amber-border)' : '1px solid var(--border-hairline)',
-                  }}
-                >
-                  <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{d.dayName}</span>
-                  <div style={{
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    backgroundColor: bg,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '10px'
-                  }}>
-                    {d.wasActive && '🔥'}
-                    {d.wasFrozen && '🧊'}
+                return (
+                  <div
+                    key={d.dateStr}
+                    title={`${d.dateStr}: ${d.wasActive ? 'Studied 🔥' : d.wasFrozen ? 'Freeze Used 🧊' : 'Not completed'}`}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '6px 2px',
+                      borderRadius: 'var(--radius-xs)',
+                      backgroundColor: d.isToday ? 'rgba(245, 158, 11, 0.08)' : 'var(--bg-app)',
+                      border: d.isToday ? '1px solid var(--amber-border)' : '1px solid var(--border-hairline)',
+                    }}
+                  >
+                    <span style={{ fontSize: '9px', color: 'var(--text-muted)' }}>{d.dayName}</span>
+                    <div style={{
+                      width: '18px',
+                      height: '18px',
+                      borderRadius: '50%',
+                      backgroundColor: bg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px'
+                    }}>
+                      {d.wasActive && '🔥'}
+                      {d.wasFrozen && '🧊'}
+                    </div>
+                    <span style={{ fontSize: '9px', color: d.isToday ? 'var(--amber)' : 'var(--text-muted)', fontWeight: d.isToday ? 700 : 500 }}>
+                      {d.dayNum}
+                    </span>
                   </div>
-                  <span style={{ fontSize: '9px', color: d.isToday ? 'var(--amber)' : 'var(--text-muted)', fontWeight: d.isToday ? 700 : 500 }}>
-                    {d.dayNum}
-                  </span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -332,6 +337,8 @@ export const StreakStudioModal: React.FC<StreakStudioModalProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px',
           padding: '12px 16px',
           borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--bg-app)',

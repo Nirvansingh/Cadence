@@ -201,8 +201,7 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
   const strokeDashoffset = 754 - (754 * progressRatio);
 
   return (
-    <div className="animate-quiet" style={{
-      padding: isZenMode ? '40px' : '36px 48px',
+    <div className={`animate-quiet ${isZenMode ? '' : 'module-container'}`} style={{
       maxWidth: isZenMode ? '100vw' : '880px',
       margin: '0 auto',
       minHeight: isZenMode ? '100vh' : 'auto',
@@ -215,11 +214,13 @@ export const FocusModule: React.FC<FocusModuleProps> = ({ soundEnabled }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '24px 28px',
+          flexWrap: 'wrap',
+          gap: '16px',
+          padding: '20px 24px',
           backgroundColor: 'var(--bg-surface)',
           borderRadius: 'var(--radius-lg)',
           border: '1px solid var(--border-hairline)',
-          marginBottom: '28px'
+          marginBottom: '24px'
         }}>
           <div>
             <span style={{

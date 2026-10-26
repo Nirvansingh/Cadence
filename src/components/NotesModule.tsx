@@ -12,7 +12,8 @@ import {
   Sigma,
   Download,
   Copy,
-  Check
+  Check,
+  ChevronLeft
 } from 'lucide-react';
 
 interface NotesModuleProps {
@@ -224,6 +225,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
   const [showFormulaBar, setShowFormulaBar] = useState(false);
   const [copiedNotice, setCopiedNotice] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [mobileView, setMobileView] = useState<'list' | 'editor'>('list');
 
   const activeNote = notes.find(n => n.id === activeNoteId) || notes[0];
 
@@ -315,6 +317,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
     storage.setNotes(updated);
     setNotes(updated);
     setActiveNoteId(newNote.id);
+    setMobileView('editor');
     playClickSound(soundEnabled);
   };
 
@@ -341,17 +344,9 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
   });
 
   return (
-    <div className="animate-quiet" style={{ display: 'flex', height: '100vh', width: '100%' }}>
+    <div className="animate-quiet notes-container">
       {/* Sidebar List */}
-      <div style={{
-        width: '280px',
-        borderRight: '1px solid var(--border-hairline)',
-        backgroundColor: 'var(--bg-surface)',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '24px 16px',
-        flexShrink: 0
-      }}>
+      <div className={`notes-sidebar-pane ${mobileView === 'editor' ? 'mobile-hidden' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
           <h3 style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text-pure)', textTransform: 'uppercase' }}>
             Notebook
@@ -412,7 +407,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
             return (
               <div
                 key={note.id}
-                onClick={() => { setActiveNoteId(note.id); playClickSound(soundEnabled); }}
+                onClick={() => { setActiveNoteId(note.id); setMobileView('editor'); playClickSound(soundEnabled); }}
                 style={{
                   padding: '10px 12px',
                   borderRadius: 'var(--radius-xs)',
@@ -454,7 +449,7 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
       </div>
 
       {/* Main Note Canvas */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: 'var(--bg-app)' }}>
+      <div className={`notes-canvas-pane ${mobileView === 'list' ? 'mobile-hidden' : ''}`}>
         {activeNote ? (
           <>
             {/* Top Toolbar */}
@@ -462,26 +457,39 @@ export const NotesModule: React.FC<NotesModuleProps> = ({ soundEnabled }) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '14px 28px',
+              flexWrap: 'wrap',
+              gap: '10px',
+              padding: '12px 20px',
               borderBottom: '1px solid var(--border-hairline)',
               backgroundColor: 'var(--bg-surface)'
             }}>
-              <input
-                type="text"
-                value={activeNote.title}
-                onChange={(e) => handleUpdateTitle(e.target.value)}
-                style={{
-                  border: 'none',
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: 'var(--text-pure)',
-                  width: '50%',
-                  backgroundColor: 'transparent',
-                  outline: 'none'
-                }}
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px', minWidth: '160px' }}>
+                <button
+                  className="notes-mobile-back-btn"
+                  onClick={() => setMobileView('list')}
+                  title="Back to notes list"
+                >
+                  <ChevronLeft size={16} />
+                  <span>Notes</span>
+                </button>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input
+                  type="text"
+                  value={activeNote.title}
+                  onChange={(e) => handleUpdateTitle(e.target.value)}
+                  style={{
+                    border: 'none',
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: 'var(--text-pure)',
+                    width: '100%',
+                    backgroundColor: 'transparent',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                 <button
                   onClick={() => setShowFormulaBar(!showFormulaBar)}
                   style={{

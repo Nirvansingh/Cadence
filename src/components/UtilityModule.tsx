@@ -400,12 +400,14 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
   const tempInK = tempInC + 273.15;
 
   return (
-    <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '920px', margin: '0 auto' }}>
+    <div className="animate-quiet module-container">
       {/* Header */}
       <div style={{
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
         paddingBottom: '20px',
         borderBottom: '1px solid var(--border-hairline)',
         marginBottom: '26px'

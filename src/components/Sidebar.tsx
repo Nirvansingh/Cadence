@@ -12,7 +12,8 @@ import {
   Compass,
   Cloud,
   Flame,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import type { SyncStatus } from '../storage/cloudSyncService';
 import { storage } from '../storage/storageAdapter';
@@ -31,6 +32,8 @@ interface SidebarProps {
   onOpenAuth?: () => void;
   onOpenStreakStudio?: () => void;
   syncStatus?: SyncStatus;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -44,9 +47,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenCloudSync,
   onOpenAuth,
   onOpenStreakStudio,
-  syncStatus = 'offline'
+  syncStatus = 'offline',
+  isOpenMobile = false,
+  onCloseMobile
 }) => {
   const streak = storage.getStreakState();
+
+  const handleNavClick = (tab: NavTab) => {
+    onTabChange(tab);
+    if (onCloseMobile) onCloseMobile();
+  };
 
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'habits', label: 'Daily Habits', icon: <CheckCircle2 size={15} strokeWidth={2} />, color: 'var(--amber)' },
@@ -59,34 +69,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside style={{
-      width: '240px',
-      height: '100vh',
-      backgroundColor: 'var(--bg-surface)',
-      borderRight: '1px solid var(--border-hairline)',
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '24px 16px',
-      flexShrink: 0
-    }}>
+    <aside 
+      className={`desktop-sidebar ${isOpenMobile ? 'mobile-open' : ''}`}
+      style={{
+        width: '240px',
+        height: '100vh',
+        backgroundColor: 'var(--bg-surface)',
+        borderRight: '1px solid var(--border-hairline)',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '24px 16px',
+        flexShrink: 0
+      }}
+    >
       {/* Brand Header */}
       <div style={{ padding: '0 8px 18px', borderBottom: '1px solid var(--border-hairline)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '10px',
-            height: '10px',
-            borderRadius: '3px',
-            backgroundColor: 'var(--emerald)'
-          }} />
-          <h1 style={{
-            fontSize: '15px',
-            fontWeight: 700,
-            letterSpacing: '0.04em',
-            color: 'var(--text-pure)',
-            textTransform: 'uppercase'
-          }}>
-            Cadence
-          </h1>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '10px',
+              height: '10px',
+              borderRadius: '3px',
+              backgroundColor: 'var(--emerald)'
+            }} />
+            <h1 style={{
+              fontSize: '15px',
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              color: 'var(--text-pure)',
+              textTransform: 'uppercase'
+            }}>
+              Cadence
+            </h1>
+          </div>
+
+          {onCloseMobile && (
+            <button
+              onClick={onCloseMobile}
+              className="mobile-close-btn"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                padding: '4px',
+                cursor: 'pointer'
+              }}
+              aria-label="Close Mobile Menu"
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', letterSpacing: '0.01em' }}>
           Daily Student Workspace
@@ -188,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           return (
             <button
               key={item.id}
-              onClick={() => onTabChange(item.id)}
+              onClick={() => handleNavClick(item.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',

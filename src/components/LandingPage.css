@@ -1052,15 +1052,30 @@
   .lp-header {
     padding: 12px 16px;
   }
+  .lp-header .lp-nav-link {
+    display: none;
+  }
   .lp-editorial-grid {
     grid-template-columns: 1fr;
   }
   .lp-hero-section {
-    padding: 40px 16px 32px;
+    padding: 36px 16px 28px;
+  }
+  .lp-hero-title {
+    font-size: 26px !important;
+    line-height: 1.25 !important;
+  }
+  .lp-hero-lead {
+    font-size: 14.5px !important;
   }
   .lp-workbench-section, .lp-section {
     padding-left: 16px;
     padding-right: 16px;
+  }
+  .lp-workbench-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
   }
   .lp-hero-cta-group {
     flex-direction: column;
@@ -1072,6 +1087,7 @@
   .lp-footer-content {
     flex-direction: column;
     align-items: flex-start;
+    gap: 16px;
   }
 }
 

@@ -371,7 +371,7 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
   };
 
   return (
-    <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="animate-quiet module-container">
       {/* Toast Notification */}
       {copyNotice && (
         <div style={{
@@ -400,6 +400,8 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '16px',
         padding: '24px 28px',
         backgroundColor: 'var(--bg-surface)',
         borderRadius: 'var(--radius-lg)',
@@ -977,10 +979,13 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
         }}>
           <div className="animate-pop" style={{
             width: '460px',
+            maxWidth: '92vw',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '26px'
+            padding: '24px'
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-pure)', marginBottom: '16px' }}>
               Add Schedule Event ({selectedDay})
@@ -1189,6 +1194,9 @@ export const TimetableModule: React.FC<TimetableModuleProps> = ({ soundEnabled }
         }}>
           <div className="animate-pop" style={{
             width: '440px',
+            maxWidth: '92vw',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',

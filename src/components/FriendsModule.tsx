@@ -87,7 +87,7 @@ export const FriendsModule: React.FC<FriendsModuleProps> = ({
   };
 
   return (
-    <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="animate-quiet module-container">
       {/* Header Banner: Social Profile & Friend Code */}
       <div className="panel-interactive" style={{
         display: 'flex',
@@ -281,6 +281,8 @@ export const FriendsModule: React.FC<FriendsModuleProps> = ({
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px',
                     padding: '12px 16px',
                     borderRadius: 'var(--radius-sm)',
                     backgroundColor: friend.isCurrentUser ? 'rgba(56, 189, 248, 0.05)' : 'var(--bg-card)',

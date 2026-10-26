@@ -182,17 +182,19 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   };
 
   return (
-    <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="animate-quiet module-container">
       {/* Header Banner - Rich Contrast & Depth */}
       <div className="panel-interactive" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '24px 28px',
+        padding: '20px 24px',
         backgroundColor: 'var(--bg-surface)',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--border-hairline)',
-        marginBottom: '28px'
+        marginBottom: '24px',
+        flexWrap: 'wrap',
+        gap: '16px'
       }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
@@ -579,8 +581,8 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
               }}
             >
               {/* Row */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1, minWidth: '220px' }}>
                   {/* Circular Checkbox */}
                   <button
                     onClick={() => handleToggleHabit(habit.id)}
@@ -746,7 +748,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
                   paddingTop: '16px',
                   borderTop: '1px solid var(--border-hairline)',
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                   gap: '12px'
                 }}>
                   {/* Step 1: Trigger */}

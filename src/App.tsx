@@ -16,7 +16,7 @@ import { CloudSyncModal } from './components/CloudSyncModal';
 import { AuthPage } from './components/AuthPage';
 import { cloudSync, type SyncStatus } from './storage/cloudSyncService';
 import { storage } from './storage/storageAdapter';
-import { Check } from 'lucide-react';
+import { Check, Menu, Flame } from 'lucide-react';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('habits');
@@ -26,6 +26,7 @@ export function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isCloudSyncOpen, setIsCloudSyncOpen] = useState(false);
   const [isStreakStudioOpen, setIsStreakStudioOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [, setStreakTick] = useState(0);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(() => cloudSync.getStatus());
 
@@ -196,7 +197,63 @@ export function App() {
 
       {/* View Mode 3: Main Productivity Workspace */}
       {viewMode === 'workspace' && (
-        <div style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: 'var(--bg-app)' }}>
+        <div className="workspace-layout" style={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: 'var(--bg-app)' }}>
+          {/* Mobile Sticky Topbar (Visible on screens <= 768px) */}
+          <div className="mobile-topbar">
+            <button
+              onClick={() => setIsMobileNavOpen(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '36px',
+                height: '36px',
+                borderRadius: 'var(--radius-xs)',
+                backgroundColor: 'var(--bg-subtle)',
+                border: '1px solid var(--border-hairline)',
+                color: 'var(--text-pure)'
+              }}
+              aria-label="Open Navigation Menu"
+            >
+              <Menu size={18} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: 'var(--emerald)' }} />
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-pure)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Cadence
+              </span>
+            </div>
+
+            <button
+              onClick={() => setIsStreakStudioOpen(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-pill)',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                border: '1px solid var(--amber-border)',
+                color: 'var(--amber)',
+                fontSize: '12px',
+                fontWeight: 700
+              }}
+              className="mono"
+            >
+              <Flame size={13} fill="var(--amber)" />
+              <span>{storage.getStreakState().currentStreak}d</span>
+            </button>
+          </div>
+
+          {/* Mobile Overlay Backdrop */}
+          {isMobileNavOpen && (
+            <div 
+              className="mobile-overlay" 
+              onClick={() => setIsMobileNavOpen(false)} 
+            />
+          )}
+
           <Sidebar
             currentTab={currentTab}
             onTabChange={(tab) => setCurrentTab(tab)}
@@ -209,6 +266,8 @@ export function App() {
             onOpenAuth={() => setViewMode('auth')}
             onOpenStreakStudio={() => setIsStreakStudioOpen(true)}
             syncStatus={syncStatus}
+            isOpenMobile={isMobileNavOpen}
+            onCloseMobile={() => setIsMobileNavOpen(false)}
           />
 
           <main key={currentTab} className="animate-pop" style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative' }}>

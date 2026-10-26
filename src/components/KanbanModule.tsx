@@ -187,17 +187,19 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
   ];
 
   return (
-    <div className="animate-quiet" style={{ padding: '36px 48px', maxWidth: '1100px', margin: '0 auto' }}>
+    <div className="animate-quiet module-container">
       {/* Header */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '24px 28px',
+        flexWrap: 'wrap',
+        gap: '16px',
+        padding: '20px 24px',
         backgroundColor: 'var(--bg-surface)',
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--border-hairline)',
-        marginBottom: '28px'
+        marginBottom: '24px'
       }}>
         <div>
           <span style={{ fontSize: '11px', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }} className="mono">
@@ -208,7 +210,7 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
           </h2>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={() => setSortByUrgency(!sortByUrgency)}
             style={{
@@ -253,7 +255,7 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
       </div>
 
       {/* 3 Columns Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '18px', alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '18px', alignItems: 'start' }}>
         {columns.map(col => {
           const colTasks = sortTasks(tasks.filter(t => t.status === col.id));
 
@@ -609,10 +611,13 @@ export const KanbanModule: React.FC<KanbanModuleProps> = ({ soundEnabled }) => {
         }}>
           <div className="animate-pop" style={{
             width: '460px',
+            maxWidth: '92vw',
+            maxHeight: '90vh',
+            overflowY: 'auto',
             backgroundColor: 'var(--bg-surface)',
             border: '1px solid var(--border-subtle)',
             borderRadius: 'var(--radius-md)',
-            padding: '26px'
+            padding: '24px'
           }}>
             <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--text-pure)', marginBottom: '16px' }}>
               Add New Task / Assignment
