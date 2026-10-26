@@ -9,6 +9,8 @@ import { FocusModule } from './components/FocusModule';
 import { KanbanModule } from './components/KanbanModule';
 import { NotesModule } from './components/NotesModule';
 import { UtilityModule } from './components/UtilityModule';
+import { FriendsModule } from './components/FriendsModule';
+import { StreakStudioModal } from './components/StreakStudioModal';
 import { CommandPalette } from './components/CommandPalette';
 import { CloudSyncModal } from './components/CloudSyncModal';
 import { AuthPage } from './components/AuthPage';
@@ -23,6 +25,8 @@ export function App() {
   const [backupNotice, setBackupNotice] = useState<string | null>(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isCloudSyncOpen, setIsCloudSyncOpen] = useState(false);
+  const [isStreakStudioOpen, setIsStreakStudioOpen] = useState(false);
+  const [, setStreakTick] = useState(0);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>(() => cloudSync.getStatus());
 
   useEffect(() => {
@@ -203,6 +207,7 @@ export function App() {
             onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
             onOpenCloudSync={() => setIsCloudSyncOpen(true)}
             onOpenAuth={() => setViewMode('auth')}
+            onOpenStreakStudio={() => setIsStreakStudioOpen(true)}
             syncStatus={syncStatus}
           />
 
@@ -213,9 +218,23 @@ export function App() {
             {currentTab === 'kanban' && <KanbanModule soundEnabled={soundEnabled} />}
             {currentTab === 'notes' && <NotesModule soundEnabled={soundEnabled} />}
             {currentTab === 'utilities' && <UtilityModule soundEnabled={soundEnabled} />}
+            {currentTab === 'friends' && (
+              <FriendsModule 
+                soundEnabled={soundEnabled} 
+                onOpenStreakStudio={() => setIsStreakStudioOpen(true)} 
+              />
+            )}
           </main>
         </div>
       )}
+
+      {/* Duolingo Streak Studio & Freezes Modal */}
+      <StreakStudioModal
+        isOpen={isStreakStudioOpen}
+        onClose={() => setIsStreakStudioOpen(false)}
+        soundEnabled={soundEnabled}
+        onStreakUpdate={() => setStreakTick(t => t + 1)}
+      />
 
       {/* View Mode 4: Dedicated 1/3 Split Cloudflare-Style Auth Portal */}
       {viewMode === 'auth' && (

@@ -10,11 +10,14 @@ import {
   VolumeX, 
   ArrowDownToLine,
   Compass,
-  Cloud
+  Cloud,
+  Flame,
+  Users
 } from 'lucide-react';
 import type { SyncStatus } from '../storage/cloudSyncService';
+import { storage } from '../storage/storageAdapter';
 
-export type NavTab = 'habits' | 'timetable' | 'focus' | 'kanban' | 'notes' | 'utilities';
+export type NavTab = 'habits' | 'timetable' | 'focus' | 'kanban' | 'notes' | 'utilities' | 'friends';
 
 interface SidebarProps {
   currentTab: NavTab;
@@ -26,6 +29,7 @@ interface SidebarProps {
   onOpenCommandPalette?: () => void;
   onOpenCloudSync?: () => void;
   onOpenAuth?: () => void;
+  onOpenStreakStudio?: () => void;
   syncStatus?: SyncStatus;
 }
 
@@ -39,8 +43,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenCommandPalette,
   onOpenCloudSync,
   onOpenAuth,
+  onOpenStreakStudio,
   syncStatus = 'offline'
 }) => {
+  const streak = storage.getStreakState();
+
   const navItems: { id: NavTab; label: string; icon: React.ReactNode; color: string }[] = [
     { id: 'habits', label: 'Daily Habits', icon: <CheckCircle2 size={15} strokeWidth={2} />, color: 'var(--amber)' },
     { id: 'timetable', label: 'Schedule', icon: <Calendar size={15} strokeWidth={2} />, color: 'var(--sky)' },
@@ -48,6 +55,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'kanban', label: 'Tasks', icon: <Kanban size={15} strokeWidth={2} />, color: 'var(--emerald)' },
     { id: 'notes', label: 'Notebook', icon: <BookOpen size={15} strokeWidth={2} />, color: 'var(--rose)' },
     { id: 'utilities', label: 'Tools', icon: <Sliders size={15} strokeWidth={2} />, color: 'var(--text-secondary)' },
+    { id: 'friends', label: 'Friends & Quests', icon: <Users size={15} strokeWidth={2} />, color: 'var(--sky)' },
   ];
 
   return (
@@ -83,6 +91,42 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', letterSpacing: '0.01em' }}>
           Daily Student Workspace
         </p>
+
+        {/* Duolingo Streak Flame Widget */}
+        <button
+          onClick={onOpenStreakStudio}
+          title="Open Streak Studio & Freezes"
+          style={{
+            marginTop: '12px',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '7px 10px',
+            borderRadius: 'var(--radius-xs)',
+            backgroundColor: 'rgba(245, 158, 11, 0.08)',
+            border: '1px solid var(--amber-border)',
+            color: 'var(--amber)',
+            fontSize: '12px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'var(--transition-fast)'
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.backgroundColor = 'rgba(245, 158, 11, 0.08)';
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Flame size={14} fill="var(--amber)" strokeWidth={2} />
+            <span className="mono">{streak.currentStreak}d Streak</span>
+          </div>
+          <span style={{ fontSize: '11px', color: 'var(--sky)', fontWeight: 600 }}>
+            🧊 {streak.freezesAvailable}/2
+          </span>
+        </button>
 
         {/* Command Palette Trigger */}
         {onOpenCommandPalette && (

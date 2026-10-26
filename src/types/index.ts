@@ -108,3 +108,51 @@ export interface CadenceBackupData {
   tasks: TaskItem[];
   focusLogs?: FocusLog[];
 }
+
+export interface StreakState {
+  currentStreak: number;
+  bestStreak: number;
+  lastActiveDate: string; // 'YYYY-MM-DD'
+  freezesAvailable: number; // 0, 1, or 2
+  freezeDates: string[]; // List of 'YYYY-MM-DD' when freeze was consumed
+  activeDates: string[]; // List of 'YYYY-MM-DD' when activity occurred
+}
+
+export interface FriendProfile {
+  id: string;
+  friendCode: string; // e.g. 'CAD-7821'
+  displayName: string;
+  avatarEmoji: string;
+  roleTitle: string; // e.g. 'Founder, Dhiti' or 'Student'
+  streak: number;
+  weeklyMinutes: number;
+  weeklyHabits: number;
+  lastActiveText: string;
+  isCurrentUser?: boolean;
+  cheersReceived: number;
+}
+
+export interface FriendQuest {
+  id: string;
+  title: string;
+  description: string;
+  partnerName: string;
+  partnerAvatar: string;
+  targetMetric: 'minutes' | 'habits';
+  currentProgress: number;
+  targetGoal: number;
+  daysLeft: number;
+  rewardXP: number;
+  isCompleted: boolean;
+}
+
+export interface CheerActivity {
+  id: string;
+  senderName: string;
+  senderAvatar: string;
+  recipientName: string;
+  type: 'high_five' | 'streak_fire' | 'nudge';
+  message: string;
+  timestamp: number;
+}
+

@@ -13,7 +13,8 @@ import {
   Download, 
   RotateCcw, 
   Home,
-  ArrowRight
+  ArrowRight,
+  Users
 } from 'lucide-react';
 import { playClickSound } from '../utils/sound';
 
@@ -107,6 +108,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       icon: <Wrench size={16} color="var(--purple)" />,
       category: 'Navigation',
       action: () => { onSelectTab('utilities'); onClose(); }
+    },
+    {
+      id: 'nav-friends',
+      title: 'Friends & Quests',
+      subtitle: 'Weekly study league, duo challenges, and high-fives',
+      icon: <Users size={16} color="var(--sky)" />,
+      category: 'Navigation',
+      action: () => { onSelectTab('friends'); onClose(); }
     },
     {
       id: 'quick-focus-25',
