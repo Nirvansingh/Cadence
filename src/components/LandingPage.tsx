@@ -284,11 +284,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <h1 className="lp-hero-title">
-          A quiet, powerful workspace for focused study and daily routines.
+          A quiet, simple workspace for your study and daily routines.
         </h1>
 
         <p className="lp-hero-lead">
-          Cadence brings together your class timetable, habit tracking, Pomodoro focus timer, tasks, and STEM notes into one fast, local-first tool. Built with zero telemetry and zero cloud tracking — we have just launched and are ready to serve your focused study workflow.
+          Cadence brings together your class timetable, daily habits, focus timer, tasks, and notes in one fast, private app. No ads, no tracking, and it works completely offline. We have just started and are ready to help you study with peace of mind.
         </p>
 
         <div className="lp-hero-cta-group">
@@ -1364,19 +1364,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Product Manifesto */}
       <section className="lp-section">
         <div className="lp-section-header">
-          <div className="lp-section-index">THE CADENCE STANDARD</div>
-          <h2 className="lp-section-title">High-Performance, Quiet Software</h2>
+          <div className="lp-section-index">OUR GOAL</div>
+          <h2 className="lp-section-title">A Fast, Quiet Tool for Learning</h2>
         </div>
 
         <div className="lp-essay-box">
           <p className="lp-essay-quote">
-            "Most modern productivity tools are either bloated corporate SaaS platforms designed for enterprise managers, or subscription traps locking student notes behind paywalls and AI buzzwords."
+            "Study tools should help you learn, not distract you with popups, subscriptions, or complex menus."
           </p>
           <p className="lp-essay-text">
-            Cadence was built on a different premise: students and researchers need software that opens in 50 milliseconds, runs completely offline in lecture halls, requires zero telemetry or mandatory accounts, and keeps your intellectual property on your own device.
+            We built Cadence with one simple goal: give students a clean place to organize their day that opens right away, works offline anywhere, and keeps all notes and data safely on their own device.
           </p>
           <p className="lp-essay-text" style={{ marginBottom: 0 }}>
-            Engineered with high typographic contrast, keyboard-driven navigation via <span className="mono">Ctrl + K</span>, and zero advertising. It is free, open source under the MIT license, and built to empower focused learning worldwide.
+            Clean design, easy keyboard shortcuts, and zero ads. It is completely free and open for everyone.
           </p>
         </div>
       </section>
@@ -1384,10 +1384,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Founding Perspectives & Advisory */}
       <section className="lp-section">
         <div className="lp-section-header">
-          <div className="lp-section-index">FOUNDING PERSPECTIVES</div>
-          <h2 className="lp-section-title">Rooted in deep work and human potential</h2>
+          <div className="lp-section-index">EARLY VOICES</div>
+          <h2 className="lp-section-title">Built with Guidance from Mentors and Builders</h2>
           <p className="lp-section-desc">
-            Voices and guidance shaping Cadence from philosophy to engineering.
+            Simple thoughts from the people helping shape Cadence.
           </p>
         </div>
 
@@ -1424,7 +1424,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 marginBottom: '14px',
                 letterSpacing: '0.04em'
               }}>
-                VISION & INITIATIVE
+                FOUNDER
               </div>
               <p style={{
                 fontSize: '13.5px',
@@ -1433,7 +1433,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 fontStyle: 'italic',
                 marginBottom: '20px'
               }}>
-                "Cadence was conceived to strip away the algorithmic noise of modern software. When your workspace respects your attention, works completely offline, and operates with zero friction, sustained focus stops being an uphill battle."
+                "Too many apps distract you with popups and notifications. We made Cadence clean and quiet so you can open your computer and study without getting interrupted."
               </p>
             </div>
 
@@ -1474,7 +1474,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 marginBottom: '14px',
                 letterSpacing: '0.04em'
               }}>
-                BEHAVIORAL GUIDANCE
+                COACHING & HABITS
               </div>
               <p style={{
                 fontSize: '13.5px',
@@ -1483,7 +1483,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 fontStyle: 'italic',
                 marginBottom: '20px'
               }}>
-                "True cognitive momentum requires routines that eliminate guilt and mental friction. Cadence's habit loops and quiet, distraction-free environment allow learners and thinkers to unlock their deep, natural potential."
+                "Building good daily habits should feel light and stress-free. Cadence helps you take small daily steps, stay consistent, and feel good about your progress."
               </p>
             </div>
 
@@ -1524,7 +1524,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 marginBottom: '14px',
                 letterSpacing: '0.04em'
               }}>
-                PRODUCT & ARCHITECTURE
+                TECH & PRODUCT
               </div>
               <p style={{
                 fontSize: '13.5px',
@@ -1533,7 +1533,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 fontStyle: 'italic',
                 marginBottom: '20px'
               }}>
-                "In an era where every utility demands your data and constant telemetry, a client-first, deterministic architecture is essential. Cadence is built with engineering discipline, putting the student in total control."
+                "Most study apps today need your personal info and an internet connection. Cadence runs directly on your computer, works 100% offline, and leaves you in full control."
               </p>
             </div>
 
