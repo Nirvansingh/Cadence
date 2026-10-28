@@ -49,29 +49,24 @@ export const StreakStudioModal: React.FC<StreakStudioModalProps> = ({
   };
 
   // Generate last 14 days for the streak track
-  const getLast14Days = () => {
-    const days = [];
-    const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-    for (let i = 13; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const str = getLocalDateString(d);
-      const isToday = i === 0;
-      const wasActive = streak.activeDates.includes(str);
-      const wasFrozen = streak.freezeDates.includes(str);
-      days.push({
-        dateStr: str,
-        dayNum: d.getDate(),
-        dayName: dayNames[d.getDay()],
-        isToday,
-        wasActive,
-        wasFrozen
-      });
-    }
-    return days;
-  };
-
-  const streakDays = getLast14Days();
+  const dayNames = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+  const streakDays = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const str = getLocalDateString(d);
+    const isToday = i === 0;
+    const wasActive = streak.activeDates.includes(str);
+    const wasFrozen = streak.freezeDates.includes(str);
+    streakDays.push({
+      dateStr: str,
+      dayNum: d.getDate(),
+      dayName: dayNames[d.getDay()],
+      isToday,
+      wasActive,
+      wasFrozen
+    });
+  }
 
   // Milestone tiers
   const milestones = [

@@ -13,6 +13,7 @@ import type {
   CheerActivity
 } from '../types';
 import { getLocalDateString } from '../utils/dateUtils';
+import { syncEngine } from './syncEngine';
 
 const STORAGE_KEYS = {
   ONBOARDING_DONE: 'cadence_onboarded_v1',
@@ -99,7 +100,8 @@ class LocalStorageAdapter {
     const raw = localStorage.getItem(STORAGE_KEYS.HABITS);
     if (!raw) return [];
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -115,7 +117,8 @@ class LocalStorageAdapter {
     const raw = localStorage.getItem(STORAGE_KEYS.HABIT_LOGS);
     if (!raw) return [];
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -155,7 +158,8 @@ class LocalStorageAdapter {
     const raw = localStorage.getItem(STORAGE_KEYS.TIMETABLE);
     if (!raw) return [];
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
@@ -171,15 +175,33 @@ class LocalStorageAdapter {
     const raw = localStorage.getItem(STORAGE_KEYS.TASKS);
     if (!raw) return [];
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
   }
 
-  setTasks(tasks: TaskItem[]): void {
+  setTasks(tasks: TaskItem[], skipSyncQueue: boolean = false): void {
+    const previous = this.getTasks();
     localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(tasks));
     this.notifyChange();
+
+    if (!skipSyncQueue) {
+      // Find updated or created tasks
+      tasks.forEach(t => {
+        const prevTask = previous.find(p => p.id === t.id);
+        if (!prevTask || prevTask.updatedAt !== t.updatedAt || prevTask.status !== t.status) {
+          syncEngine.enqueueMutation('tasks', t, 'upsert');
+        }
+      });
+      // Find deleted tasks (tombstone)
+      previous.forEach(p => {
+        if (!tasks.some(t => t.id === p.id)) {
+          syncEngine.enqueueMutation('tasks', { ...p, is_deleted: true }, 'upsert');
+        }
+      });
+    }
   }
 
   // Notes
@@ -187,15 +209,31 @@ class LocalStorageAdapter {
     const raw = localStorage.getItem(STORAGE_KEYS.NOTES);
     if (!raw) return [];
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }
   }
 
-  setNotes(notes: NoteItem[]): void {
+  setNotes(notes: NoteItem[], skipSyncQueue: boolean = false): void {
+    const previous = this.getNotes();
     localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
     this.notifyChange();
+
+    if (!skipSyncQueue) {
+      notes.forEach(n => {
+        const prevNote = previous.find(p => p.id === n.id);
+        if (!prevNote || prevNote.updatedAt !== n.updatedAt) {
+          syncEngine.enqueueMutation('notes', n, 'upsert');
+        }
+      });
+      previous.forEach(p => {
+        if (!notes.some(n => n.id === p.id)) {
+          syncEngine.enqueueMutation('notes', { ...p, is_deleted: true }, 'upsert');
+        }
+      });
+    }
   }
 
   // Focus Sessions
@@ -203,7 +241,8 @@ class LocalStorageAdapter {
     const raw = localStorage.getItem(STORAGE_KEYS.FOCUS_LOGS);
     if (!raw) return [];
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
     }

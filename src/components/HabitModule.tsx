@@ -42,6 +42,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
   const [newReward, setNewReward] = useState('');
 
   const todayStr = getLocalDateString();
+  const todayFormatted = React.useMemo(() => {
+    return new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  }, []);
 
   const isHabitCompleted = (habitId: string, dateStr: string) => {
     return logs.some(l => l.habitId === habitId && l.completedDate === dateStr);
@@ -97,7 +100,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
     return streak;
   };
 
-  const getLast7Days = () => {
+  const weekDays = React.useMemo(() => {
     const days: { dateStr: string; label: string }[] = [];
     const labels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     for (let i = 6; i >= 0; i--) {
@@ -107,10 +110,9 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
       days.push({ dateStr: str, label: labels[d.getDay()] });
     }
     return days;
-  };
-  const weekDays = getLast7Days();
+  }, []);
 
-  const getLast30Days = () => {
+  const monthDays = React.useMemo(() => {
     const days: { dateStr: string; dayNum: number; weekday: string; isToday: boolean }[] = [];
     const labels = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     for (let i = 29; i >= 0; i--) {
@@ -125,8 +127,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
       });
     }
     return days;
-  };
-  const monthDays = getLast30Days();
+  }, []);
 
   const filteredHabits = habits.filter(h => {
     if (selectedFilter === 'all') return true;
@@ -211,7 +212,7 @@ export const HabitModule: React.FC<HabitModuleProps> = ({ soundEnabled }) => {
               fontWeight: 600
             }}>
               <Calendar size={12} />
-              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+              {todayFormatted}
             </span>
           </div>
 

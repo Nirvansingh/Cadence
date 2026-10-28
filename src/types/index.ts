@@ -4,6 +4,7 @@ export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night' | 'anytime
 
 export interface Habit {
   id: string;
+  user_id?: string;
   title: string;
   category: HabitCategory;
   timeOfDay: TimeOfDay;
@@ -17,23 +18,28 @@ export interface Habit {
   stackAfterHabitId?: string;
   sortOrder: number;
   isArchived: boolean;
+  is_deleted?: boolean;
   createdAt: number;
   updatedAt: number;
 }
 
 export interface FocusLog {
   id: string;
+  user_id?: string;
   dateStr: string; // 'YYYY-MM-DD'
   minutes: number;
   timestamp: number;
+  is_deleted?: boolean;
 }
 
 export interface HabitLog {
   id: string;
+  user_id?: string;
   habitId: string;
   completedDate: string; // 'YYYY-MM-DD'
   completedAt: number;
   notes?: string;
+  is_deleted?: boolean;
 }
 
 export type DayOfWeek = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -42,6 +48,7 @@ export type TimetableCategory = 'school' | 'tuition' | 'study' | 'workout' | 'me
 
 export interface TimetableSlot {
   id: string;
+  user_id?: string;
   dayOfWeek: DayOfWeek;
   startTime: string; // 'HH:MM' 24hr
   endTime: string;   // 'HH:MM' 24hr
@@ -49,16 +56,19 @@ export interface TimetableSlot {
   category: TimetableCategory;
   note?: string;
   sortOrder: number;
+  is_deleted?: boolean;
   createdAt: number;
   updatedAt: number;
 }
 
 export interface NoteItem {
   id: string;
+  user_id?: string;
   title: string;
   content: string;
   tags: string[];
   isPinned: boolean;
+  is_deleted?: boolean;
   createdAt: number;
   updatedAt: number;
 }
@@ -74,6 +84,7 @@ export interface Subtask {
 
 export interface TaskItem {
   id: string;
+  user_id?: string;
   title: string;
   description?: string;
   status: TaskStatus;
@@ -82,6 +93,7 @@ export interface TaskItem {
   tags: string[];
   subtasks?: Subtask[];
   sortOrder: number;
+  is_deleted?: boolean;
   createdAt: number;
   updatedAt: number;
 }

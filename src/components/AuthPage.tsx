@@ -18,11 +18,13 @@ import {
 interface AuthPageProps {
   onBackToWorkspace: () => void;
   onSuccess: () => void;
+  onOpenAbout?: () => void;
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({
   onBackToWorkspace,
-  onSuccess
+  onSuccess,
+  onOpenAbout
 }) => {
   const [authMethod, setAuthMethod] = useState<'otp' | 'password'>('otp');
   const [otpStep, setOtpStep] = useState<'request' | 'verify'>('request');
@@ -376,33 +378,63 @@ export const AuthPage: React.FC<AuthPageProps> = ({
               </span>
             </div>
 
-            <button
-              onClick={onBackToWorkspace}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-xs)',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid var(--border-hairline)',
-                color: 'var(--text-muted)',
-                fontSize: '11.5px',
-                cursor: 'pointer',
-                transition: 'var(--transition-fast)'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.color = 'var(--text-pure)';
-                e.currentTarget.style.borderColor = 'var(--border-subtle)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.borderColor = 'var(--border-hairline)';
-              }}
-            >
-              <ArrowLeft size={13} />
-              <span>Workspace</span>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {onOpenAbout && (
+                <button
+                  type="button"
+                  onClick={onOpenAbout}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 'var(--radius-xs)',
+                    backgroundColor: 'transparent',
+                    border: '1px solid var(--border-hairline)',
+                    color: 'var(--text-muted)',
+                    fontSize: '11.5px',
+                    cursor: 'pointer',
+                    transition: 'var(--transition-fast)'
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.color = 'var(--text-pure)';
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.color = 'var(--text-muted)';
+                    e.currentTarget.style.borderColor = 'var(--border-hairline)';
+                  }}
+                >
+                  About Cadence
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={onBackToWorkspace}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid var(--border-hairline)',
+                  color: 'var(--text-muted)',
+                  fontSize: '11.5px',
+                  cursor: 'pointer',
+                  transition: 'var(--transition-fast)'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = 'var(--text-pure)';
+                  e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                  e.currentTarget.style.borderColor = 'var(--border-hairline)';
+                }}
+              >
+                <ArrowLeft size={13} />
+                <span>Guest Workspace</span>
+              </button>
+            </div>
           </div>
 
           <h1 style={{
@@ -958,7 +990,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
 
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
               <CheckCircle2 size={16} strokeWidth={1.5} color="var(--emerald)" style={{ flexShrink: 0, marginTop: '2px' }} />
-              <span><strong>Cross-Platform Parity:</strong> Seamless continuity between the native Windows app (.exe), web browser, and offline PWA.</span>
+              <span><strong>Cross-Platform Parity:</strong> Seamless continuity between the web application and upcoming dedicated Android & iOS mobile apps.</span>
             </div>
           </div>
 
@@ -973,7 +1005,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({
             color: '#64748b'
           }}>
             <span>TLS 1.3 • AES-GCM • POSTGRES 15</span>
-            <span style={{ color: 'var(--emerald)' }}>4,200+ ACTIVE LEARNERS</span>
+            <span style={{ color: 'var(--emerald)' }}>FRESHLY LAUNCHED • READY TO SERVE</span>
           </div>
         </div>
       </div>

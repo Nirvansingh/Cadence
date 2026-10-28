@@ -54,8 +54,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setQuery('');
-      setSelectedIndex(0);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);
@@ -181,10 +179,6 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     cmd.category.toLowerCase().includes(query.toLowerCase())
   );
 
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -252,7 +246,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
             ref={inputRef}
             type="text"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
             placeholder="Type a command or search modules..."
             style={{
               flex: 1,

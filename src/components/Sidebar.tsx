@@ -386,7 +386,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }}
           >
             <Compass size={14} color="var(--text-muted)" />
-            <span>Product Overview</span>
+            <span>About & Mobile Apps</span>
           </button>
         )}
       </div>

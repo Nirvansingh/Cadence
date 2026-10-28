@@ -5,6 +5,8 @@ import { cloudSync, type SyncStatus } from './storage/cloudSyncService';
 import { storage } from './storage/storageAdapter';
 import { Check, Menu, Flame } from 'lucide-react';
 
+import { supabase } from './storage/supabaseClient';
+
 // Lazy-load all pages and modules to achieve 100/100 PageSpeed Performance
 const LandingPage = lazy(() => import('./components/LandingPage').then(m => ({ default: m.LandingPage })));
 const HabitModule = lazy(() => import('./components/HabitModule').then(m => ({ default: m.HabitModule })));
@@ -27,6 +29,7 @@ const ModuleLoader = () => (
   </div>
 );
 
+
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('habits');
   const [profile, setProfile] = useState(() => storage.getProfile());
@@ -45,15 +48,63 @@ export function App() {
     });
   }, []);
 
-  // App View Mode: 'landing' | 'onboarding' | 'workspace' | 'auth'
+  // App View Mode: 'workspace' | 'auth' | 'landing' | 'onboarding'
+  // App-First: Default directly to 'workspace' if session/data exists, or 'landing' if user navigated to #about
   const [viewMode, setViewMode] = useState<'landing' | 'onboarding' | 'workspace' | 'auth'>(() => {
     if (typeof window !== 'undefined') {
-      if (window.location.hash === '#about' || window.location.search.includes('landing')) {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#about' || hash === '#info' || window.location.search.includes('about')) {
         return 'landing';
       }
+      if (hash === '#login' || hash === '#auth' || hash === '#signin') {
+        return 'auth';
+      }
     }
-    return storage.isOnboardingCompleted() ? 'workspace' : 'landing';
+    // App-First priority: Users jump directly into workspace (or auth if explicitly signing in)
+    return storage.isOnboardingCompleted() ? 'workspace' : 'auth';
   });
+
+  // Session listener for persistent login and instant cross-tab sync
+  useEffect(() => {
+    // 1. Initial session check
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        // Authenticated user directly gets their workspace
+        if (viewMode === 'auth' || (viewMode === 'landing' && window.location.hash !== '#about')) {
+          setViewMode('workspace');
+        }
+      }
+    });
+
+    // 2. Auth state subscription (sign in, sign out, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setProfile(storage.getProfile());
+        setViewMode('workspace');
+      } else if (event === 'SIGNED_OUT') {
+        // Safe account sign out: return to clean login
+        setViewMode('auth');
+      }
+    });
+
+    // 3. Hash change listener for '#about' or '#workspace'
+    const handleHashChange = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (hash === '#about') {
+        setViewMode('landing');
+      } else if (hash === '#auth' || hash === '#login') {
+        setViewMode('auth');
+      } else if (hash === '#workspace' || hash === '') {
+        setViewMode('workspace');
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [viewMode]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -324,6 +375,7 @@ export function App() {
               setProfile(storage.getProfile());
               setViewMode('workspace');
             }}
+            onOpenAbout={() => setViewMode('landing')}
           />
         </Suspense>
       )}

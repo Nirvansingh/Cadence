@@ -227,16 +227,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         <nav className="lp-header-actions">
-          <a 
-            href="https://github.com/Nirvansingh/Cadence/releases" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="lp-nav-link"
-            title="Download Cadence Desktop for Windows (.exe)"
-          >
-            <span>Desktop (.exe)</span>
-          </a>
-
           <button 
             onClick={() => setIsImportModalOpen(true)} 
             className="lp-nav-link" 
@@ -295,19 +285,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <div className="lp-hero-cta-group">
             <button onClick={onExploreDirectly} className="lp-btn-hero-primary">
-              <span>Launch Web App</span>
+              <span>Open Web Workspace</span>
               <ArrowRight size={15} />
             </button>
 
-            <a 
-              href="https://github.com/Nirvansingh/Cadence/releases" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="lp-btn-hero-secondary"
-            >
-              <Download size={15} />
-              <span>Download Desktop (.exe)</span>
-            </a>
+            {onOpenAuth && (
+              <button onClick={onOpenAuth} className="lp-btn-hero-secondary">
+                <span>Sign In / Sync</span>
+              </button>
+            )}
 
             <a 
               href="https://github.com/Nirvansingh/Cadence" 
@@ -316,7 +302,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               className="lp-btn-hero-text"
             >
               <GithubIcon size={14} />
-              <span>View on GitHub ↗</span>
+              <span>GitHub ↗</span>
             </a>
           </div>
 
@@ -1639,33 +1625,155 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Final Call to Action Section */}
       <section className="lp-section" style={{ paddingBottom: '40px' }}>
         <div className="lp-final-cta-card">
-          <div className="lp-section-index" style={{ color: 'var(--lp-sage)', marginBottom: '8px' }}>READY TO FOCUS</div>
+          <div className="lp-section-index" style={{ color: 'var(--lp-sage)', marginBottom: '8px' }}>OFFICIAL APPS & WEB WORKSPACE</div>
           <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--lp-text-primary)', margin: '0 0 12px', letterSpacing: '-0.02em' }}>
-            Start your next study session with zero distractions.
+            Access Cadence on the Web, Android, and iOS.
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--lp-text-secondary)', maxWidth: '580px', margin: '0 auto 28px', lineHeight: 1.6 }}>
-            Download the native Windows desktop app for fast keyboard-driven focus, or open the workspace right in your browser. No mandatory sign-up, no credit card, no corporate tracking.
+            Use the full-featured Cadence web app directly in any desktop or mobile browser. Dedicated native mobile apps for Android and iOS are in active release preparation.
           </p>
 
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a 
-              href="https://github.com/Nirvansingh/Cadence/releases" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="lp-btn-hero-primary"
-            >
-              <Download size={15} />
-              <span>Download Desktop (.exe)</span>
-            </a>
+          {/* Official Mobile Apps Distribution Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+            maxWidth: '680px',
+            margin: '0 auto 28px',
+            textAlign: 'left'
+          }}>
+            {/* Google Play Store Card */}
+            <div style={{
+              padding: '20px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: '14px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {/* Android Robot Icon */}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--emerald)">
+                      <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-1 0-.5514.4482-1 .9993-1C18.0741 13.3414 18.523 13.79 18.523 14.3414c0 .5514-.4489 1-.9993 1m-11.046 0c-.5511 0-.9993-.4486-.9993-1 0-.5514.4482-1 .9993-1C6.9804 13.3414 7.477 13.79 7.477 14.3414c0 .5514-.4966 1-.9993 1m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1523-.5676.416.416 0 00-.5676.1523l-2.0223 3.503C15.5898 8.4116 13.8443 8.0833 12 8.0833s-3.5898.3283-5.137.8666L4.8407 5.4469a.416.416 0 00-.5676-.1523.416.416 0 00-.1523.5676l1.9973 3.4592C2.6889 11.1867.3433 14.6589 0 18.7917h24c-.3433-4.1328-2.6889-7.605-6.1185-9.4703" />
+                    </svg>
+                    <span style={{ fontWeight: 600, color: 'var(--lp-text-primary)', fontSize: '15px' }}>Android</span>
+                  </div>
+                  <span style={{
+                    fontSize: '11px',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-pill)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    color: 'var(--emerald)',
+                    fontWeight: 600,
+                    letterSpacing: '0.04em'
+                  }}>
+                    Coming Soon
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--lp-text-muted)', margin: 0, lineHeight: 1.5 }}>
+                  Dedicated native application published on the Google Play Store with widget support and notifications.
+                </p>
+              </div>
 
-            <button onClick={onExploreDirectly} className="lp-btn-hero-secondary">
-              <span>Launch Web App</span>
+              <button 
+                disabled 
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid var(--border-hairline)',
+                  color: 'var(--text-muted)',
+                  fontSize: '12px',
+                  cursor: 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>Google Play Listing Pending</span>
+              </button>
+            </div>
+
+            {/* Apple App Store Card */}
+            <div style={{
+              padding: '20px',
+              backgroundColor: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              gap: '14px'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {/* Apple Icon */}
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="var(--text-pure)">
+                      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.61 1.34-.55.63-.99 1.66-.88 2.68 1.01.08 2.01-.52 2.57-1.17z" />
+                    </svg>
+                    <span style={{ fontWeight: 600, color: 'var(--lp-text-primary)', fontSize: '15px' }}>iOS</span>
+                  </div>
+                  <span style={{
+                    fontSize: '11px',
+                    padding: '2px 8px',
+                    borderRadius: 'var(--radius-pill)',
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    color: 'var(--sky)',
+                    fontWeight: 600,
+                    letterSpacing: '0.04em'
+                  }}>
+                    Coming Soon
+                  </span>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--lp-text-muted)', margin: 0, lineHeight: 1.5 }}>
+                  Native iPhone and iPad application published on the Apple App Store with full cross-device synchronization.
+                </p>
+              </div>
+
+              <button 
+                disabled 
+                style={{
+                  width: '100%',
+                  padding: '9px 12px',
+                  borderRadius: 'var(--radius-xs)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  border: '1px solid var(--border-hairline)',
+                  color: 'var(--text-muted)',
+                  fontSize: '12px',
+                  cursor: 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>App Store Listing Pending</span>
+              </button>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button onClick={onExploreDirectly} className="lp-btn-hero-primary">
+              <span>Open Web Workspace Now</span>
               <ArrowRight size={15} />
             </button>
+
+            {onOpenAuth && (
+              <button onClick={onOpenAuth} className="lp-btn-hero-secondary">
+                <span>Sign In / Create Account</span>
+              </button>
+            )}
           </div>
 
           <div style={{ marginTop: '22px', fontSize: '11.5px', color: 'var(--lp-text-muted)', fontFamily: 'JetBrains Mono' }}>
-            Windows 10/11 64-bit • macOS & Linux builds available on GitHub • Progressive Web App ready
+            Runs seamlessly in any modern browser • Shared cloud database via Supabase • 100% Free
           </div>
         </div>
       </section>
@@ -1701,14 +1809,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Cloud Sync
               </button>
             )}
-            <a 
-              href="https://github.com/Nirvansingh/Cadence/releases" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="lp-footer-link"
-            >
-              Desktop (.exe) ↗
-            </a>
             <a 
               href="https://github.com/Nirvansingh/Cadence" 
               target="_blank" 
