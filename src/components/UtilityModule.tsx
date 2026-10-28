@@ -154,18 +154,30 @@ export const UtilityModule: React.FC<UtilityModuleProps> = ({ soundEnabled }) =>
 
   // Live Hash Computation
   useEffect(() => {
+    let isCancelled = false;
     if (!hashInput) {
-      setSha256Hex('');
-      setSha1Hex('');
+      Promise.resolve().then(() => {
+        if (!isCancelled) {
+          setSha256Hex('');
+          setSha1Hex('');
+        }
+      });
       return;
     }
     const enc = new TextEncoder().encode(hashInput);
     window.crypto.subtle.digest('SHA-256', enc).then(buf => {
-      setSha256Hex(Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+      if (!isCancelled) {
+        setSha256Hex(Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+      }
     });
     window.crypto.subtle.digest('SHA-1', enc).then(buf => {
-      setSha1Hex(Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+      if (!isCancelled) {
+        setSha1Hex(Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''));
+      }
     });
+    return () => {
+      isCancelled = true;
+    };
   }, [hashInput]);
 
   const handleCalcPress = (val: string) => {

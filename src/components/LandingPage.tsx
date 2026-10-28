@@ -212,10 +212,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* Dynamic Background Scroll Layer */}
       <div className="lp-bg-scroll-layer" aria-hidden="true">
         <div className="lp-bg-scroll-grid" />
-        <div className="lp-bg-scroll-orb lp-bg-orb-1" />
-        <div className="lp-bg-scroll-orb lp-bg-orb-2" />
-        <div className="lp-bg-scroll-orb lp-bg-orb-3" />
-        <div className="lp-bg-scroll-beam" />
       </div>
 
       {/* Precision Header */}
@@ -223,7 +219,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="lp-brand">
           <div className="lp-brand-mark" />
           <span className="lp-brand-name">Cadence</span>
-          <span className="lp-brand-badge">v1.0.4 • local-first</span>
+          <span className="lp-brand-badge">local-first</span>
         </div>
 
         <nav className="lp-header-actions">
@@ -321,13 +317,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="lp-workbench">
           {/* Workbench Top Bar */}
           <div className="lp-workbench-topbar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div className="lp-workbench-dots">
-                <span className="lp-workbench-dot" />
-                <span className="lp-workbench-dot" />
-                <span className="lp-workbench-dot" />
-              </div>
-              <span style={{ color: 'var(--lp-text-secondary)' }}>cadence • student-workspace • v1.0.4-production</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="lp-brand-mark" style={{ width: '9px', height: '9px', borderRadius: '2px' }} />
+              <span style={{ color: 'var(--lp-text-primary)', fontWeight: 600 }}>Cadence Workspace</span>
             </div>
             <span style={{ fontSize: '10.5px', color: 'var(--lp-text-muted)' }}>PRESS CTRL+K IN WORKSPACE</span>
           </div>

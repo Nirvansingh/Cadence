@@ -366,7 +366,7 @@ export function App() {
         </Suspense>
       )}
 
-      {/* View Mode 4: Dedicated 1/3 Split Cloudflare-Style Auth Portal */}
+      {/* View Mode 4: Dedicated Auth Portal */}
       {viewMode === 'auth' && (
         <Suspense fallback={<ModuleLoader />}>
           <AuthPage
